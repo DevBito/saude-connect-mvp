@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from 'react-query'
+import { useAuth } from '../context/AuthContext'
 import { professionalService } from '../services/professionalService'
 import { 
   Search, 
@@ -9,10 +10,13 @@ import {
   Clock, 
   Filter,
   User,
-  Calendar
+  Calendar,
+  LogOut,
+  ArrowLeft
 } from 'lucide-react'
 
 export default function Professionals() {
+  const { user, logout } = useAuth()
   const [filters, setFilters] = useState({
     search: '',
     specialty: '',
@@ -75,207 +79,601 @@ export default function Professionals() {
   }
 
   return (
-    <div className="space-y-6">
+    <div style={{
+      minHeight: '100vh',
+      font: '400 1rem/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"',
+      color: 'var(--text)',
+      background: `
+        radial-gradient(800px 400px at 20% -10%, color-mix(in srgb, var(--secondary-500) 14%, transparent), transparent 70%),
+        radial-gradient(900px 500px at 80% -20%, color-mix(in srgb, var(--primary-500) 16%, transparent), transparent 70%),
+        linear-gradient(180deg, #fff, var(--surface-2))
+      `,
+      WebkitFontSmoothing: 'antialiased',
+      MozOsxFontSmoothing: 'grayscale',
+      padding: '28px'
+    }}>
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Profissionais de Saúde</h1>
-          <p className="text-gray-600">Encontre o profissional ideal para sua necessidade</p>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Buscar por nome..."
-              value={filters.search}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-            />
+      <header style={{
+        position: 'sticky',
+        top: '0',
+        zIndex: '50',
+        backdropFilter: 'saturate(140%) blur(10px)',
+        background: 'color-mix(in srgb, var(--surface) 80%, transparent)',
+        borderBottom: '1px solid var(--line)',
+        borderRadius: '16px',
+        marginBottom: '32px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: '72px',
+          padding: '0 24px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Link 
+              to="/dashboard" 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: 'var(--muted)',
+                textDecoration: 'none',
+                fontSize: '.9rem',
+                fontWeight: '600'
+              }}
+            >
+              <ArrowLeft size={16} />
+              Voltar
+            </Link>
+            <Link 
+              to="/" 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                fontWeight: '800',
+                letterSpacing: '.2px',
+                textDecoration: 'none',
+                color: 'inherit'
+              }}
+            >
+              <span style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                display: 'grid',
+                placeItems: 'center',
+                color: '#fff',
+                background: 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
+                boxShadow: 'var(--shadow-2)',
+                fontWeight: '800',
+                fontSize: '20px'
+              }}>S</span>
+              <span>Saúde Connect</span>
+            </Link>
           </div>
 
-          {/* Specialty */}
-          <select
-            value={filters.specialty}
-            onChange={(e) => handleFilterChange('specialty', e.target.value)}
-            className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-          >
-            <option value="">Todas as especialidades</option>
-            {specialties.map(specialty => (
-              <option key={specialty} value={specialty}>{specialty}</option>
-            ))}
-          </select>
-
-          {/* Location */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <MapPin className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Cidade ou estado..."
-              value={filters.location}
-              onChange={(e) => handleFilterChange('location', e.target.value)}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-            />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button
+              onClick={logout}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 16px',
+                borderRadius: '10px',
+                fontWeight: '600',
+                fontSize: '.9rem',
+                border: '1px solid var(--line)',
+                cursor: 'pointer',
+                transition: '.2s border-color ease',
+                background: 'var(--surface)',
+                color: 'var(--text)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 30%, var(--line))';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.borderColor = 'var(--line)';
+              }}
+            >
+              <LogOut size={16} />
+              Sair
+            </button>
           </div>
-
-          {/* Availability */}
-          <select
-            value={filters.availability}
-            onChange={(e) => handleFilterChange('availability', e.target.value)}
-            className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-          >
-            <option value="">Disponibilidade</option>
-            <option value="today">Hoje</option>
-            <option value="tomorrow">Amanhã</option>
-            <option value="this_week">Esta semana</option>
-            <option value="online">Online</option>
-          </select>
         </div>
-      </div>
+      </header>
 
-      {/* Results */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {isLoading ? (
-          Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
-                <div className="flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+      <main style={{ width: 'min(100%, var(--container))', marginInline: 'auto' }} role="main">
+        {/* Page Header */}
+        <section style={{
+          background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+          backdropFilter: 'blur(6px)',
+          border: '1px solid var(--line)',
+          borderRadius: '22px',
+          boxShadow: 'var(--shadow-1)',
+          padding: '32px',
+          marginBottom: '32px',
+          backgroundImage: 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
+          color: '#fff'
+        }}>
+          <div>
+            <h1 style={{ 
+              margin: '0 0 8px', 
+              fontSize: 'clamp(1.8rem, 1.6rem + 1vw, 2.4rem)', 
+              lineHeight: '1.2',
+              fontWeight: '800'
+            }}>
+              Profissionais de Saúde 👨‍⚕️
+            </h1>
+            <p style={{ 
+              margin: '0', 
+              opacity: '0.9',
+              fontSize: '1.1rem'
+            }}>
+              Encontre o profissional ideal para sua necessidade
+            </p>
+          </div>
+        </section>
+
+        {/* Filters */}
+        <section style={{
+          background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+          backdropFilter: 'blur(6px)',
+          border: '1px solid var(--line)',
+          borderRadius: '18px',
+          boxShadow: 'var(--shadow-1)',
+          padding: '24px',
+          marginBottom: '32px'
+        }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '16px'
+          }}>
+            {/* Search */}
+            <div style={{ position: 'relative' }}>
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '12px',
+                transform: 'translateY(-50%)',
+                color: 'var(--muted)'
+              }}>
+                <Search size={20} />
+              </div>
+              <input
+                type="text"
+                placeholder="Buscar por nome..."
+                value={filters.search}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px 12px 12px 44px',
+                  border: '1px solid var(--line)',
+                  borderRadius: '12px',
+                  background: 'var(--surface)',
+                  color: 'var(--text)',
+                  fontSize: '1rem',
+                  transition: '.2s border-color ease, .2s box-shadow ease'
+                }}
+                onFocus={(e) => {
+                  e.target.style.outline = 'none';
+                  e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 50%, var(--line))';
+                  e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--primary-600) 18%, transparent)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'var(--line)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+
+            {/* Specialty */}
+            <select
+              value={filters.specialty}
+              onChange={(e) => handleFilterChange('specialty', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '1px solid var(--line)',
+                borderRadius: '12px',
+                background: 'var(--surface)',
+                color: 'var(--text)',
+                fontSize: '1rem',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="">Todas as especialidades</option>
+              {specialties.map(specialty => (
+                <option key={specialty} value={specialty}>{specialty}</option>
+              ))}
+            </select>
+
+            {/* Location */}
+            <div style={{ position: 'relative' }}>
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '12px',
+                transform: 'translateY(-50%)',
+                color: 'var(--muted)'
+              }}>
+                <MapPin size={20} />
+              </div>
+              <input
+                type="text"
+                placeholder="Cidade ou estado..."
+                value={filters.location}
+                onChange={(e) => handleFilterChange('location', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px 12px 12px 44px',
+                  border: '1px solid var(--line)',
+                  borderRadius: '12px',
+                  background: 'var(--surface)',
+                  color: 'var(--text)',
+                  fontSize: '1rem',
+                  transition: '.2s border-color ease, .2s box-shadow ease'
+                }}
+                onFocus={(e) => {
+                  e.target.style.outline = 'none';
+                  e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 50%, var(--line))';
+                  e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--primary-600) 18%, transparent)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'var(--line)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+
+            {/* Availability */}
+            <select
+              value={filters.availability}
+              onChange={(e) => handleFilterChange('availability', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '1px solid var(--line)',
+                borderRadius: '12px',
+                background: 'var(--surface)',
+                color: 'var(--text)',
+                fontSize: '1rem',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="">Disponibilidade</option>
+              <option value="today">Hoje</option>
+              <option value="tomorrow">Amanhã</option>
+              <option value="this_week">Esta semana</option>
+              <option value="online">Online</option>
+            </select>
+          </div>
+        </section>
+
+        {/* Results */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+          gap: '24px'
+        }}>
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} style={{
+                background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+                backdropFilter: 'blur(6px)',
+                border: '1px solid var(--line)',
+                borderRadius: '18px',
+                boxShadow: 'var(--shadow-1)',
+                padding: '24px',
+                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+                  <div style={{
+                    width: '64px',
+                    height: '64px',
+                    background: 'var(--surface-2)',
+                    borderRadius: '50%'
+                  }}></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      height: '16px',
+                      background: 'var(--surface-2)',
+                      borderRadius: '8px',
+                      width: '75%',
+                      marginBottom: '8px'
+                    }}></div>
+                    <div style={{
+                      height: '12px',
+                      background: 'var(--surface-2)',
+                      borderRadius: '6px',
+                      width: '50%'
+                    }}></div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{
+                    height: '12px',
+                    background: 'var(--surface-2)',
+                    borderRadius: '6px'
+                  }}></div>
+                  <div style={{
+                    height: '12px',
+                    background: 'var(--surface-2)',
+                    borderRadius: '6px',
+                    width: '83%'
+                  }}></div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="h-3 bg-gray-200 rounded"></div>
-                <div className="h-3 bg-gray-200 rounded w-5/6"></div>
-              </div>
-            </div>
-          ))
-        ) : professionals?.length > 0 ? (
-          professionals.map((professional) => (
-            <div key={professional.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center">
-                    <User className="w-8 h-8 text-primary-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {professional.name}
-                    </h3>
-                    <p className="text-primary-600 font-medium">
-                      {professional.specialty}
-                    </p>
-                    {professional.sub_specialty && (
-                      <p className="text-sm text-gray-600">
-                        {professional.sub_specialty}
+            ))
+          ) : professionals?.length > 0 ? (
+            professionals.map((professional) => (
+              <div key={professional.id} style={{
+                background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+                backdropFilter: 'blur(6px)',
+                border: '1px solid var(--line)',
+                borderRadius: '18px',
+                boxShadow: 'var(--shadow-1)',
+                padding: '24px',
+                transition: '.2s transform ease, .2s box-shadow ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = 'var(--shadow-2)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'none';
+                e.target.style.boxShadow = 'var(--shadow-1)';
+              }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <div style={{
+                      width: '64px',
+                      height: '64px',
+                      background: 'var(--primary-100)',
+                      borderRadius: '50%',
+                      display: 'grid',
+                      placeItems: 'center'
+                    }}>
+                      <User size={32} style={{ color: 'var(--primary-600)' }} />
+                    </div>
+                    <div>
+                      <h3 style={{
+                        margin: '0 0 4px',
+                        fontSize: '1.1rem',
+                        fontWeight: '700',
+                        color: 'var(--text)'
+                      }}>
+                        {professional.name}
+                      </h3>
+                      <p style={{
+                        margin: '0 0 4px',
+                        color: 'var(--primary-600)',
+                        fontWeight: '600',
+                        fontSize: '.95rem'
+                      }}>
+                        {professional.specialty}
                       </p>
+                      {professional.sub_specialty && (
+                        <p style={{
+                          margin: '0',
+                          fontSize: '.85rem',
+                          color: 'var(--muted)'
+                        }}>
+                          {professional.sub_specialty}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                      {renderStars(professional.rating || 0)}
+                    </div>
+                    <p style={{
+                      margin: '0',
+                      fontSize: '.8rem',
+                      color: 'var(--muted)'
+                    }}>
+                      {professional.review_count || 0} avaliações
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                  {professional.city && professional.state && (
+                    <div style={{ display: 'flex', alignItems: 'center', fontSize: '.9rem', color: 'var(--muted)' }}>
+                      <MapPin size={16} style={{ marginRight: '6px' }} />
+                      {professional.city}, {professional.state}
+                    </div>
+                  )}
+                  
+                  {professional.consultation_price && (
+                    <div style={{ fontSize: '.9rem', color: 'var(--muted)' }}>
+                      <span style={{ fontWeight: '600' }}>R$ {professional.consultation_price}</span> por consulta
+                    </div>
+                  )}
+
+                  {professional.experience_years && (
+                    <div style={{ fontSize: '.9rem', color: 'var(--muted)' }}>
+                      {professional.experience_years} anos de experiência
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    {professional.accepts_online && (
+                      <span style={{
+                        background: 'var(--success-100)',
+                        color: 'var(--success-600)',
+                        padding: '4px 8px',
+                        borderRadius: '12px',
+                        fontSize: '.75rem',
+                        fontWeight: '600'
+                      }}>
+                        Online
+                      </span>
+                    )}
+                    {professional.accepts_insurance && (
+                      <span style={{
+                        background: 'var(--primary-100)',
+                        color: 'var(--primary-600)',
+                        padding: '4px 8px',
+                        borderRadius: '12px',
+                        fontSize: '.75rem',
+                        fontWeight: '600'
+                      }}>
+                        Convênio
+                      </span>
                     )}
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="flex items-center space-x-1 mb-1">
-                    {renderStars(professional.rating || 0)}
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    {professional.review_count || 0} avaliações
+
+                {professional.bio && (
+                  <p style={{
+                    margin: '0 0 16px',
+                    fontSize: '.9rem',
+                    color: 'var(--muted)',
+                    lineHeight: '1.4',
+                    display: '-webkit-box',
+                    WebkitLineClamp: '2',
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}>
+                    {professional.bio}
                   </p>
+                )}
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Link
+                    to={`/professionals/${professional.id}`}
+                    style={{
+                      color: 'var(--primary-600)',
+                      fontSize: '.9rem',
+                      fontWeight: '600',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    Ver perfil completo
+                  </Link>
+                  <Link
+                    to={`/scheduling/${professional.id}`}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px 16px',
+                      borderRadius: '10px',
+                      fontWeight: '600',
+                      fontSize: '.9rem',
+                      border: '1px solid transparent',
+                      cursor: 'pointer',
+                      transition: '.2s transform ease, .25s box-shadow ease, .2s filter ease',
+                      background: 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
+                      color: '#fff',
+                      boxShadow: 'var(--shadow-2)',
+                      textDecoration: 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.filter = 'brightness(1.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.filter = 'none';
+                    }}
+                  >
+                    <Calendar size={16} />
+                    Agendar
+                  </Link>
                 </div>
               </div>
-
-              <div className="space-y-2 mb-4">
-                {professional.city && professional.state && (
-                  <div className="flex items-center text-sm text-gray-600">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    {professional.city}, {professional.state}
-                  </div>
-                )}
-                
-                {professional.consultation_price && (
-                  <div className="text-sm text-gray-600">
-                    <span className="font-medium">R$ {professional.consultation_price}</span> por consulta
-                  </div>
-                )}
-
-                {professional.experience_years && (
-                  <div className="text-sm text-gray-600">
-                    {professional.experience_years} anos de experiência
-                  </div>
-                )}
-
-                <div className="flex items-center space-x-4 text-sm text-gray-600">
-                  {professional.accepts_online && (
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                      Online
-                    </span>
-                  )}
-                  {professional.accepts_insurance && (
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                      Convênio
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {professional.bio && (
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                  {professional.bio}
-                </p>
-              )}
-
-              <div className="flex items-center justify-between">
-                <Link
-                  to={`/professionals/${professional.id}`}
-                  className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-                >
-                  Ver perfil completo
-                </Link>
-                <Link
-                  to={`/scheduling/${professional.id}`}
-                  className="btn btn-primary btn-sm flex items-center gap-2"
-                >
-                  <Calendar size={16} />
-                  Agendar
-                </Link>
-              </div>
+            ))
+          ) : (
+            <div style={{
+              gridColumn: '1 / -1',
+              textAlign: 'center',
+              padding: '48px 0'
+            }}>
+              <User size={64} style={{ color: 'var(--muted)', margin: '0 auto 16px' }} />
+              <h3 style={{
+                margin: '0 0 8px',
+                fontSize: '1.2rem',
+                fontWeight: '600',
+                color: 'var(--text)'
+              }}>
+                Nenhum profissional encontrado
+              </h3>
+              <p style={{
+                margin: '0 0 20px',
+                color: 'var(--muted)'
+              }}>
+                Tente ajustar os filtros de busca
+              </p>
+              <button
+                onClick={() => setFilters({ search: '', specialty: '', location: '', availability: '' })}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '12px 20px',
+                  borderRadius: '12px',
+                  fontWeight: '600',
+                  fontSize: '.95rem',
+                  border: '1px solid var(--line)',
+                  cursor: 'pointer',
+                  transition: '.2s border-color ease',
+                  background: 'var(--surface)',
+                  color: 'var(--text)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 30%, var(--line))';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.borderColor = 'var(--line)';
+                }}
+              >
+                Limpar filtros
+              </button>
             </div>
-          ))
-        ) : (
-          <div className="col-span-full text-center py-12">
-            <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Nenhum profissional encontrado
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Tente ajustar os filtros de busca
-            </p>
-            <button
-              onClick={() => setFilters({ search: '', specialty: '', location: '', availability: '' })}
-              className="btn btn-secondary"
+          )}
+        </div>
+
+        {/* Load More */}
+        {professionals?.length > 0 && (
+          <div style={{ textAlign: 'center', marginTop: '32px' }}>
+            <button style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              borderRadius: '12px',
+              fontWeight: '600',
+              fontSize: '.95rem',
+              border: '1px solid var(--line)',
+              cursor: 'pointer',
+              transition: '.2s border-color ease',
+              background: 'var(--surface)',
+              color: 'var(--text)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 30%, var(--line))';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.borderColor = 'var(--line)';
+            }}
             >
-              Limpar filtros
+              Carregar mais profissionais
             </button>
           </div>
         )}
-      </div>
+      </main>
 
-      {/* Load More */}
-      {professionals?.length > 0 && (
-        <div className="text-center">
-          <button className="btn btn-secondary">
-            Carregar mais profissionais
-          </button>
-        </div>
-      )}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
     </div>
   )
 }

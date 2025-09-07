@@ -26,17 +26,13 @@ function App() {
         {/* Protected Routes */}
         <Route path="/dashboard" element={
           <ProtectedRoute>
-            <Layout>
-              <Dashboard />
-            </Layout>
+            <Dashboard />
           </ProtectedRoute>
         } />
         
         <Route path="/professionals" element={
           <ProtectedRoute>
-            <Layout>
-              <Professionals />
-            </Layout>
+            <Professionals />
           </ProtectedRoute>
         } />
         
