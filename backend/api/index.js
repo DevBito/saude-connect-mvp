@@ -1,12 +1,29 @@
 // Vercel serverless function entry point
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
+
+// Security middleware
+app.use(helmet());
+app.use(compression());
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: {
+    error: 'Muitas tentativas. Tente novamente em 15 minutos.'
+  }
+});
+app.use('/api/', limiter);
 
 // CORS configuration
 app.use(cors({
