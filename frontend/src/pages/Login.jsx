@@ -1,211 +1,161 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
-import { useAuth } from '../context/AuthContext'
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-export default function Login() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const { login, error, clearError } = useAuth()
-  const navigate = useNavigate()
+const Login = () => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm()
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
-  const onSubmit = async (data) => {
-    setIsLoading(true)
-    clearError()
-    
-    const result = await login(data.email, data.password)
-    
-    if (result.success) {
-      navigate('/dashboard')
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      await login(formData.email, formData.password);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message || 'Erro ao fazer login');
+    } finally {
+      setLoading(false);
     }
-    
-    setIsLoading(false)
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center py-12">
-      <div className="w-full max-w-2xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <div className="flex justify-center animate-fade-in mb-8">
-            <div className="w-24 h-24 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-3xl flex items-center justify-center shadow-medium">
-              <span className="text-white font-bold text-5xl">S</span>
-            </div>
-          </div>
-          <h2 className="text-6xl font-bold text-gray-900 animate-slide-up mb-6">
-            Entre na sua conta
-          </h2>
-          <p className="text-2xl text-gray-700 animate-slide-up" style={{animationDelay: '0.1s'}}>
-            Ou{' '}
-            <Link
-              to="/register"
-              className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
-            >
-              crie uma nova conta
-            </Link>
-          </p>
+    <div className="min-h-screen flex items-center justify-center" style={{
+      background: 'radial-gradient(800px 400px at 20% -10%, color-mix(in srgb, var(--secondary-500) 18%, transparent), transparent 70%), radial-gradient(900px 500px at 80% -20%, color-mix(in srgb, var(--primary-500) 22%, transparent), transparent 70%)'
+    }}>
+      <div className="w-full max-w-md px-6">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <Link to="/" className="brand inline-flex items-center gap-3 mb-6">
+            <span className="logo">S</span>
+            <span className="text-2xl font-bold">Saúde Connect</span>
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Bem-vindo de volta</h1>
+          <p className="text-gray-600">Entre na sua conta para continuar</p>
         </div>
 
-        <div className="bg-white/95 backdrop-blur-sm py-16 px-12 shadow-medium rounded-3xl border border-gray-100 animate-slide-up" style={{animationDelay: '0.2s'}}>
-          <form className="space-y-10" onSubmit={handleSubmit(onSubmit)}>
-            {error && (
-              <div className="bg-error-50 border border-error-200 text-error-700 px-4 py-3 rounded-md">
-                {error}
-              </div>
-            )}
+        {/* Form */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-100 p-8">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+              {error}
+            </div>
+          )}
 
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
                 Email
               </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  {...register('email', {
-                    required: 'Email é obrigatório',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Email inválido'
-                    }
-                  })}
-                  type="email"
-                  className="block w-full pl-12 pr-4 py-4 text-lg border border-gray-300 rounded-2xl shadow-soft placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                  placeholder="seu@email.com"
-                />
-              </div>
-              {errors.email && (
-                <p className="mt-1 text-sm text-error-600">{errors.email.message}</p>
-              )}
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-lg"
+                placeholder="seu@email.com"
+              />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
                 Senha
               </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  {...register('password', {
-                    required: 'Senha é obrigatória'
-                  })}
-                  type={showPassword ? 'text' : 'password'}
-                  className="block w-full pl-12 pr-12 py-4 text-lg border border-gray-300 rounded-2xl shadow-soft placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                  placeholder="Sua senha"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="mt-1 text-sm text-error-600">{errors.password.message}</p>
-              )}
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-lg"
+                placeholder="••••••••"
+              />
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
+              <label className="flex items-center">
                 <input
-                  id="remember-me"
-                  name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Lembrar de mim
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
-                  Esqueceu sua senha?
-                </a>
-              </div>
+                <span className="ml-2 text-sm text-gray-600">Lembrar de mim</span>
+              </label>
+              <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                Esqueceu a senha?
+              </Link>
             </div>
 
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center py-5 px-8 border border-transparent rounded-2xl shadow-medium text-xl font-medium text-white bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all btn-modern"
-              >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="spinner mr-3"></div>
-                    Entrando...
-                  </div>
-                ) : (
-                  'Entrar'
-                )}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full btn btn-primary py-4 text-lg font-semibold"
+            >
+              {loading ? 'Entrando...' : 'Entrar'}
+            </button>
           </form>
 
-          <div className="mt-6">
+          {/* Social Login */}
+          <div className="mt-8">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-gray-200" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Ou continue com</span>
+                <span className="px-4 bg-white text-gray-500">Ou continue com</span>
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                className="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-xl shadow-soft bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:shadow-medium transition-all"
-              >
-                <svg className="h-5 w-5" viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="currentColor"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="currentColor"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="currentColor"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <button className="w-full inline-flex justify-center items-center px-4 py-3 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
                 <span className="ml-2">Google</span>
               </button>
 
-              <button
-                type="button"
-                className="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-xl shadow-soft bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:shadow-medium transition-all"
-              >
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+              <button className="w-full inline-flex justify-center items-center px-4 py-3 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
                 <span className="ml-2">Facebook</span>
               </button>
             </div>
           </div>
+
+          {/* Sign up link */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-600">
+              Não tem uma conta?{' '}
+              <Link to="/register" className="text-primary-600 hover:text-primary-700 font-semibold">
+                Criar conta gratuita
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default Login;

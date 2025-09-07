@@ -1,254 +1,183 @@
-import { Link } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { Calendar, Users, Shield, Heart } from 'lucide-react'
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-export default function Home() {
-  const { isAuthenticated } = useAuth()
-
-  const features = [
-    {
-      icon: Calendar,
-      title: 'Agendamento Fácil',
-      description: 'Agende suas consultas de forma rápida e prática, 24 horas por dia.'
-    },
-    {
-      icon: Users,
-      title: 'Profissionais Qualificados',
-      description: 'Acesso a uma rede de profissionais de saúde verificados e especializados.'
-    },
-    {
-      icon: Shield,
-      title: 'Dados Seguros',
-      description: 'Seus dados médicos são protegidos com as melhores práticas de segurança.'
-    },
-    {
-      icon: Heart,
-      title: 'Cuidado Integral',
-      description: 'Acompanhe seu histórico médico e tenha acesso aos seus resultados.'
-    }
-  ]
-
+const Home = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="container mx-auto">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-medium">
-                <span className="text-white font-bold text-2xl">S</span>
-              </div>
-              <span className="text-2xl font-bold text-gray-900">Saúde Connect</span>
-            </div>
-            
-            <nav className="hidden md:flex items-center space-x-10">
-              <a href="#features" className="text-gray-600 hover:text-primary-600 transition-colors text-lg">Recursos</a>
-              <a href="#about" className="text-gray-600 hover:text-primary-600 transition-colors text-lg">Sobre</a>
-              <a href="#contact" className="text-gray-600 hover:text-primary-600 transition-colors text-lg">Contato</a>
-            </nav>
+      <header role="banner">
+        <div className="container nav" aria-label="Barra de navegação">
+          <Link className="brand" to="/" aria-label="Saúde Connect — Início">
+            <span className="logo" aria-hidden="true">S</span>
+            <span>Saúde Connect</span>
+          </Link>
 
-            <div className="flex items-center space-x-6">
-              {isAuthenticated ? (
-                <Link to="/dashboard" className="btn btn-primary btn-lg">
-                  Dashboard
-                </Link>
-              ) : (
-                <>
-                  <Link to="/login" className="text-gray-600 hover:text-primary-600 transition-colors text-lg font-medium">
-                    Entrar
-                  </Link>
-                  <Link to="/register" className="btn btn-primary btn-lg">
-                    Criar Conta
-                  </Link>
-                </>
-              )}
-            </div>
+          <nav aria-label="Principal" className="nav-links" style={{display: 'flex', gap: '22px'}}>
+            <a href="#features">Recursos</a>
+            <a href="#about">Sobre</a>
+            <a href="#contact">Contato</a>
+          </nav>
+
+          <div className="actions">
+            <Link className="btn btn-outline" to="/login" rel="nofollow">Entrar</Link>
+            <Link className="btn btn-primary" to="/register">Criar Conta</Link>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-40 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-50/30 to-secondary-50/20"></div>
-        <div className="container mx-auto text-center relative z-10">
-          <div className="animate-fade-in">
-            <h1 className="text-6xl md:text-8xl font-bold text-gray-900 mb-10 leading-tight">
-              Sua saúde em suas mãos
-            </h1>
-            <p className="text-2xl md:text-3xl text-gray-700 mb-16 max-w-5xl mx-auto leading-relaxed">
-              Conecte-se com profissionais de saúde qualificados, agende consultas 
-              online e presenciais, e gerencie seu histórico médico de forma segura e prática.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-12 justify-center">
-              {!isAuthenticated && (
-                <>
-                  <Link to="/register" className="btn btn-primary btn-lg btn-modern shadow-medium text-lg px-16 py-5">
-                    Começar Agora
-                  </Link>
-                  <Link to="/login" className="btn btn-secondary btn-lg shadow-soft text-lg px-16 py-5">
-                    Já tenho conta
-                  </Link>
-                </>
-              )}
-              {isAuthenticated && (
-                <Link to="/professionals" className="btn btn-primary btn-lg btn-modern shadow-medium text-lg px-16 py-5">
-                  Buscar Profissionais
-                </Link>
-              )}
-            </div>
+      {/* Hero */}
+      <section className="hero" aria-labelledby="hero-title">
+        <div className="container">
+          <h1 id="hero-title">Sua saúde em suas mãos</h1>
+          <p>Conecte-se com profissionais de saúde qualificados, agende consultas online ou presenciais e gerencie seu histórico médico com segurança.</p>
+          <div className="cta">
+            <Link className="btn btn-primary" to="/register" aria-label="Começar agora">Começar agora</Link>
+            <Link className="btn btn-outline" to="/login" aria-label="Já tenho conta">Já tenho conta</Link>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-40 bg-gradient-to-br from-white to-primary-50">
-        <div className="container mx-auto">
-          <div className="text-center mb-24">
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-8">
-              Por que escolher o Saúde Connect?
-            </h2>
-            <p className="text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
-              Oferecemos uma plataforma completa para gerenciar sua saúde de forma digital e segura
-            </p>
-          </div>
+      {/* Features */}
+      <section id="features" aria-labelledby="features-title">
+        <div className="container">
+          <h2 id="features-title" className="section-title">Por que escolher o Saúde Connect?</h2>
+          <p className="section-sub">Plataforma completa para centralizar seus cuidados de saúde com agendamento simples, dados protegidos e acompanhamento contínuo.</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-            {features.map((feature, index) => {
-              const Icon = feature.icon
-              const colors = [
-                'bg-gradient-to-br from-primary-500 to-primary-600',
-                'bg-gradient-to-br from-secondary-500 to-secondary-600',
-                'bg-gradient-to-br from-health-blue-500 to-health-blue-600',
-                'bg-gradient-to-br from-health-teal-500 to-health-teal-600'
-              ]
-              return (
-                <div key={index} className="card card-hover p-12 text-center animate-slide-up bg-white/90 backdrop-blur-sm" style={{animationDelay: `${index * 0.1}s`}}>
-                  <div className={`w-28 h-28 ${colors[index]} rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-medium`}>
-                    <Icon className="w-14 h-14 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-8">
-                    {feature.title}
-                  </h3>
-                  <p className="text-lg text-gray-700 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              )
-            })}
+          <div className="grid" role="list">
+            <article className="feature" role="listitem">
+              <div className="icon" aria-hidden="true">
+                {/* Calendário */}
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
+              <h3>Agendamento fácil</h3>
+              <p>Marque consultas 24/7 com poucos toques e receba lembretes automáticos.</p>
+            </article>
+
+            <article className="feature" role="listitem">
+              <div className="icon" aria-hidden="true">
+                {/* Usuários */}
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <h3>Profissionais qualificados</h3>
+              <p>Rede verificada com especialidades diversas e atendimento presencial ou online.</p>
+            </article>
+
+            <article className="feature" role="listitem">
+              <div className="icon" aria-hidden="true">
+                {/* Escudo */}
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <h3>Dados seguros</h3>
+              <p>Autenticação robusta, criptografia e controle de acesso por perfil.</p>
+            </article>
+
+            <article className="feature" role="listitem">
+              <div className="icon" aria-hidden="true">
+                {/* Coração */}
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                </svg>
+              </div>
+              <h3>Cuidado integral</h3>
+              <p>Dashboard com próximas consultas, histórico de atendimentos e resultados.</p>
+            </article>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-40 bg-gradient-to-br from-primary-50 via-white to-secondary-50">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-20 text-center">
-            <div className="animate-fade-in">
-              <div className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent mb-8">1000+</div>
-              <div className="text-2xl text-gray-700 font-medium">Profissionais Cadastrados</div>
-            </div>
-            <div className="animate-fade-in" style={{animationDelay: '0.2s'}}>
-              <div className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-secondary-500 to-secondary-600 bg-clip-text text-transparent mb-8">5000+</div>
-              <div className="text-2xl text-gray-700 font-medium">Consultas Realizadas</div>
-            </div>
-            <div className="animate-fade-in" style={{animationDelay: '0.4s'}}>
-              <div className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-health-blue-500 to-health-blue-600 bg-clip-text text-transparent mb-8">98%</div>
-              <div className="text-2xl text-gray-700 font-medium">Satisfação dos Usuários</div>
-            </div>
+      {/* Stats */}
+      <section className="stats" aria-label="Indicadores">
+        <div className="container grid">
+          <div className="stat" style={{gridColumn: 'span 12'}}>
+            <div className="num">1000+</div>
+            <div className="label">Profissionais cadastrados</div>
+          </div>
+          <div className="stat" style={{gridColumn: 'span 12'}}>
+            <div className="num">5000+</div>
+            <div className="label">Consultas realizadas</div>
+          </div>
+          <div className="stat" style={{gridColumn: 'span 12'}}>
+            <div className="num">98%</div>
+            <div className="label">Satisfação dos usuários</div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-40 bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 to-secondary-600/90"></div>
-        <div className="container mx-auto text-center relative z-10">
-          <div className="animate-fade-in">
-            <h2 className="text-5xl md:text-7xl font-bold text-white mb-10">
-              Pronto para cuidar da sua saúde?
-            </h2>
-            <p className="text-2xl text-white/95 mb-16 max-w-4xl mx-auto leading-relaxed">
-              Junte-se a milhares de pessoas que já confiam no Saúde Connect para gerenciar sua saúde de forma segura e eficiente
-            </p>
-            {!isAuthenticated && (
-              <Link to="/register" className="btn btn-lg bg-white text-primary-600 hover:bg-gray-100 shadow-medium btn-modern text-xl px-20 py-6">
-                Criar Conta Gratuita
-              </Link>
-            )}
+      {/* CTA */}
+      <section aria-labelledby="cta-title">
+        <div className="container">
+          <div className="cta-block">
+            <h2 id="cta-title">Pronto para cuidar da sua saúde?</h2>
+            <p>Junte-se a milhares de pessoas que organizam seus cuidados no Saúde Connect.</p>
+            <Link className="btn btn-primary" to="/register" aria-label="Criar conta gratuita">Criar conta gratuita</Link>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-br from-primary-800 via-primary-900 to-primary-950 text-white py-24">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-20">
-            <div className="md:col-span-1">
-              <div className="flex items-center space-x-4 mb-10">
-                <div className="w-16 h-16 bg-gradient-to-br from-white to-blue-100 rounded-3xl flex items-center justify-center shadow-medium">
-                  <span className="text-primary-600 font-bold text-3xl">S</span>
-                </div>
-                <span className="text-4xl font-bold">Saúde Connect</span>
-              </div>
-              <p className="text-blue-100 leading-relaxed text-xl">
-                Conectando pessoas a profissionais de saúde qualificados de forma segura e prática.
-              </p>
+      <footer role="contentinfo">
+        <div className="container foot-grid">
+          <div className="foot-brand">
+            <div className="brand" aria-label="Saúde Connect">
+              <span className="logo" aria-hidden="true">S</span>
+              <span style={{fontSize: '1.25rem', fontWeight: '800'}}>Saúde Connect</span>
             </div>
-            
-            <div>
-              <h3 className="font-semibold text-lg mb-6">Produto</h3>
-              <ul className="space-y-3 text-gray-400">
-                <li><a href="#features" className="hover:text-white transition-colors">Recursos</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Preços</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Segurança</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-lg mb-6">Suporte</h3>
-              <ul className="space-y-3 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Central de Ajuda</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contato</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Status</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-lg mb-6">Legal</h3>
-              <ul className="space-y-3 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Termos de Uso</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacidade</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">LGPD</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cookies</a></li>
-              </ul>
-            </div>
+            <p style={{color: 'var(--muted)', maxWidth: '50ch', marginTop: '10px'}}>
+              Conectando pessoas a profissionais de saúde de forma segura, prática e humana.
+            </p>
           </div>
-          
-          <div className="border-t border-gray-800 mt-12 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-400 mb-4 md:mb-0">
-                &copy; 2024 Saúde Connect. Todos os direitos reservados.
-              </p>
-              <div className="flex space-x-6">
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <span className="sr-only">LinkedIn</span>
-                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <span className="sr-only">Twitter</span>
-                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                  </svg>
-                </a>
-              </div>
-            </div>
+
+          <nav className="foot-col" aria-label="Produto">
+            <div className="foot-title">Produto</div>
+            <a className="foot-link" href="#features">Recursos</a>
+            <a className="foot-link" href="#">Preços</a>
+            <a className="foot-link" href="#">Segurança</a>
+            <a className="foot-link" href="#">API</a>
+          </nav>
+
+          <nav className="foot-col" aria-label="Suporte">
+            <div className="foot-title">Suporte</div>
+            <a className="foot-link" href="#contact">Central de Ajuda</a>
+            <a className="foot-link" href="#contact">Contato</a>
+            <a className="foot-link" href="#">FAQ</a>
+            <a className="foot-link" href="#">Status</a>
+          </nav>
+
+          <nav className="foot-col" aria-label="Legal">
+            <div className="foot-title">Legal</div>
+            <a className="foot-link" href="#">Termos de Uso</a>
+            <a className="foot-link" href="#">Privacidade</a>
+            <a className="foot-link" href="#">LGPD</a>
+            <a className="foot-link" href="#">Cookies</a>
+          </nav>
+        </div>
+
+        <div className="container foot-bottom">
+          <p>© 2024 Saúde Connect. Todos os direitos reservados.</p>
+          <div style={{display: 'flex', gap: '14px'}}>
+            <a className="foot-link" href="#" aria-label="LinkedIn">LinkedIn</a>
+            <a className="foot-link" href="#" aria-label="Twitter">Twitter</a>
           </div>
         </div>
       </footer>
     </div>
-  )
-}
+  );
+};
+
+export default Home;
