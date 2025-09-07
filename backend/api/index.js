@@ -17,32 +17,53 @@ const app = express();
 
 // Database connection
 const getDatabaseUrl = () => {
+  let databaseUrl = null;
+  
   // Tentar URL sem pooling primeiro (menos problemas de SSL)
   if (process.env.SAUDE_POSTGRES_URL_NON_POOLING) {
     console.log('✅ Usando SAUDE_POSTGRES_URL_NON_POOLING');
-    return process.env.SAUDE_POSTGRES_URL_NON_POOLING;
-  }
-  
-  // Usar SAUDE_POSTGRES_URL como fallback
-  if (process.env.SAUDE_POSTGRES_URL) {
+    databaseUrl = process.env.SAUDE_POSTGRES_URL_NON_POOLING;
+  } else if (process.env.SAUDE_POSTGRES_URL) {
     console.log('✅ Usando SAUDE_POSTGRES_URL');
-    return process.env.SAUDE_POSTGRES_URL;
+    databaseUrl = process.env.SAUDE_POSTGRES_URL;
+  } else {
+    // Construir URL a partir das variáveis individuais como último recurso
+    const user = process.env.SAUDE_POSTGRES_USER;
+    const password = process.env.SAUDE_POSTGRES_PASSWORD;
+    const host = process.env.SAUDE_POSTGRES_HOST;
+    const database = process.env.SAUDE_POSTGRES_DATABASE;
+    
+    if (user && password && host && database) {
+      databaseUrl = `postgresql://${user}:${password}@${host}:5432/${database}`;
+      console.log('✅ Construindo URL a partir de variáveis individuais');
+    }
   }
   
-  // Construir URL a partir das variáveis individuais como último recurso
-  const user = process.env.SAUDE_POSTGRES_USER;
-  const password = process.env.SAUDE_POSTGRES_PASSWORD;
-  const host = process.env.SAUDE_POSTGRES_HOST;
-  const database = process.env.SAUDE_POSTGRES_DATABASE;
-  
-  if (user && password && host && database) {
-    const constructedUrl = `postgresql://${user}:${password}@${host}:5432/${database}`;
-    console.log('✅ Construindo URL a partir de variáveis individuais');
-    return constructedUrl;
+  if (!databaseUrl) {
+    console.log('❌ Nenhuma variável de banco encontrada');
+    return null;
   }
   
-  console.log('❌ Nenhuma variável de banco encontrada');
-  return null;
+  // FORÇAR SSL DESABILITADO NA URL
+  console.log('🔧 FORÇANDO SSL DESABILITADO NA URL...');
+  console.log('URL original:', databaseUrl);
+  
+  // Remover TODOS os parâmetros SSL existentes
+  databaseUrl = databaseUrl.replace(/[?&]sslmode=[^&]*/g, '');
+  databaseUrl = databaseUrl.replace(/[?&]ssl=[^&]*/g, '');
+  databaseUrl = databaseUrl.replace(/[?&]sslcert=[^&]*/g, '');
+  databaseUrl = databaseUrl.replace(/[?&]sslkey=[^&]*/g, '');
+  databaseUrl = databaseUrl.replace(/[?&]sslrootcert=[^&]*/g, '');
+  
+  // Adicionar sslmode=disable FORÇADAMENTE
+  if (databaseUrl.includes('?')) {
+    databaseUrl += '&sslmode=disable';
+  } else {
+    databaseUrl += '?sslmode=disable';
+  }
+  
+  console.log('✅ URL FINAL COM SSL FORÇADAMENTE DESABILITADO:', databaseUrl);
+  return databaseUrl;
 };
 
 // JWT Secret
@@ -327,24 +348,65 @@ app.get('/api/url-test', async (req, res) => {
       continue;
     }
     
+    // Teste 1: URL original com SSL desabilitado no pool
     try {
-      console.log(`Testando ${urlConfig.name}...`);
-      const testPool = new Pool({
+      console.log(`Testando ${urlConfig.name} (SSL desabilitado no pool)...`);
+      const testPool1 = new Pool({
         connectionString: urlConfig.url,
         ssl: false
       });
       
-      const result = await testPool.query('SELECT NOW() as current_time');
-      await testPool.end();
+      const result1 = await testPool1.query('SELECT NOW() as current_time');
+      await testPool1.end();
       
       results.push({
-        test: urlConfig.name,
+        test: `${urlConfig.name} (SSL desabilitado no pool)`,
         success: true,
-        currentTime: result.rows[0].current_time
+        currentTime: result1.rows[0].current_time
       });
     } catch (error) {
       results.push({
-        test: urlConfig.name,
+        test: `${urlConfig.name} (SSL desabilitado no pool)`,
+        success: false,
+        error: error.message
+      });
+    }
+    
+    // Teste 2: URL modificada com sslmode=disable
+    try {
+      console.log(`Testando ${urlConfig.name} (sslmode=disable na URL)...`);
+      let modifiedUrl = urlConfig.url;
+      
+      // Remover TODOS os parâmetros SSL existentes
+      modifiedUrl = modifiedUrl.replace(/[?&]sslmode=[^&]*/g, '');
+      modifiedUrl = modifiedUrl.replace(/[?&]ssl=[^&]*/g, '');
+      modifiedUrl = modifiedUrl.replace(/[?&]sslcert=[^&]*/g, '');
+      modifiedUrl = modifiedUrl.replace(/[?&]sslkey=[^&]*/g, '');
+      modifiedUrl = modifiedUrl.replace(/[?&]sslrootcert=[^&]*/g, '');
+      
+      // Adicionar sslmode=disable FORÇADAMENTE
+      if (modifiedUrl.includes('?')) {
+        modifiedUrl += '&sslmode=disable';
+      } else {
+        modifiedUrl += '?sslmode=disable';
+      }
+      
+      const testPool2 = new Pool({
+        connectionString: modifiedUrl,
+        ssl: false
+      });
+      
+      const result2 = await testPool2.query('SELECT NOW() as current_time');
+      await testPool2.end();
+      
+      results.push({
+        test: `${urlConfig.name} (sslmode=disable na URL)`,
+        success: true,
+        currentTime: result2.rows[0].current_time
+      });
+    } catch (error) {
+      results.push({
+        test: `${urlConfig.name} (sslmode=disable na URL)`,
         success: false,
         error: error.message
       });
@@ -352,7 +414,7 @@ app.get('/api/url-test', async (req, res) => {
   }
   
   res.json({
-    message: 'Testes de diferentes URLs',
+    message: 'Testes de diferentes URLs com SSL forçadamente desabilitado',
     results: results,
     recommendation: results.find(r => r.success) ? 
       `Use: ${results.find(r => r.success).test}` : 

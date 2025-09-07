@@ -3,8 +3,38 @@ const dotenv = require('dotenv')
 
 dotenv.config()
 
+// Função para forçar SSL desabilitado na URL
+const getDatabaseUrl = () => {
+  let databaseUrl = process.env.SAUDE_POSTGRES_URL_NON_POOLING || process.env.SAUDE_POSTGRES_URL;
+  
+  if (!databaseUrl) {
+    console.log('❌ Nenhuma URL de banco encontrada');
+    return null;
+  }
+  
+  // FORÇAR SSL DESABILITADO NA URL
+  console.log('🔧 FORÇANDO SSL DESABILITADO NA URL...');
+  
+  // Remover TODOS os parâmetros SSL existentes
+  databaseUrl = databaseUrl.replace(/[?&]sslmode=[^&]*/g, '');
+  databaseUrl = databaseUrl.replace(/[?&]ssl=[^&]*/g, '');
+  databaseUrl = databaseUrl.replace(/[?&]sslcert=[^&]*/g, '');
+  databaseUrl = databaseUrl.replace(/[?&]sslkey=[^&]*/g, '');
+  databaseUrl = databaseUrl.replace(/[?&]sslrootcert=[^&]*/g, '');
+  
+  // Adicionar sslmode=disable FORÇADAMENTE
+  if (databaseUrl.includes('?')) {
+    databaseUrl += '&sslmode=disable';
+  } else {
+    databaseUrl += '?sslmode=disable';
+  }
+  
+  console.log('✅ URL FINAL COM SSL FORÇADAMENTE DESABILITADO');
+  return databaseUrl;
+}
+
 const pool = new Pool({
-  connectionString: process.env.SAUDE_POSTGRES_URL_NON_POOLING || process.env.SAUDE_POSTGRES_URL,
+  connectionString: getDatabaseUrl(),
   ssl: false,
   max: 20,
   idleTimeoutMillis: 30000,
