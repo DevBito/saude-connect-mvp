@@ -19,6 +19,10 @@
       "dest": "/api/backend"
     },
     {
+      "src": "/health",
+      "dest": "/api/backend"
+    },
+    {
       "src": "/(.*)",
       "dest": "frontend/dist/$1"
     }
