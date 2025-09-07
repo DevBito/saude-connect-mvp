@@ -90,10 +90,17 @@ app.use('/api/', limiter);
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [
+    process.env.FRONTEND_URL || 'http://localhost:3000',
+    'https://saude-connect-mvp.vercel.app',
+    'https://saude-connect-mvp.vercel.app/',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
 }));
 
 // Body parsing middleware
@@ -832,6 +839,48 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // ===== USER ROUTES =====
+
+// Get current user (alias for /users/profile)
+app.get('/api/auth/me', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    
+    const result = await pool.query(
+      'SELECT id, name, email, phone, cpf, created_at FROM users WHERE id = $1',
+      [userId]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuário não encontrado'
+      });
+    }
+    
+    const user = result.rows[0];
+    
+    res.json({
+      success: true,
+      data: {
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          cpf: user.cpf,
+          createdAt: user.created_at
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Erro ao buscar usuário atual:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro interno do servidor',
+      error: error.message
+    });
+  }
+});
 
 // Buscar perfil do usuário logado
 app.get('/api/users/profile', authenticateToken, async (req, res) => {
