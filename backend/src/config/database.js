@@ -8,7 +8,8 @@ const pool = new Pool({
   ssl: {
     rejectUnauthorized: false,
     checkServerIdentity: () => undefined,
-    secureProtocol: 'TLSv1_2_method'
+    secureProtocol: 'TLSv1_2_method',
+    ciphers: 'ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH'
   },
   max: 20,
   idleTimeoutMillis: 30000,

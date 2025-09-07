@@ -50,7 +50,8 @@ const pool = new Pool({
   ssl: {
     rejectUnauthorized: false,
     checkServerIdentity: () => undefined,
-    secureProtocol: 'TLSv1_2_method'
+    secureProtocol: 'TLSv1_2_method',
+    ciphers: 'ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH'
   }
 });
 
@@ -330,10 +331,43 @@ app.get('/api/ssl-test', async (req, res) => {
     });
   }
   
-  // Teste 2: SSL com configuração permissiva
+  // Teste 2: URL modificada para forçar SSL desabilitado
+  try {
+    console.log('Testando URL modificada...');
+    let modifiedUrl = getDatabaseUrl();
+    if (modifiedUrl) {
+      // Remover parâmetros SSL da URL
+      modifiedUrl = modifiedUrl.replace(/[?&]sslmode=[^&]*/g, '');
+      modifiedUrl = modifiedUrl.replace(/[?&]ssl=[^&]*/g, '');
+      // Adicionar sslmode=disable
+      modifiedUrl += (modifiedUrl.includes('?') ? '&' : '?') + 'sslmode=disable';
+    }
+    
+    const testPool2 = new Pool({
+      connectionString: modifiedUrl,
+      ssl: false
+    });
+    
+    const result2 = await testPool2.query('SELECT NOW() as current_time');
+    await testPool2.end();
+    
+    results.push({
+      test: 'URL modificada (sslmode=disable)',
+      success: true,
+      currentTime: result2.rows[0].current_time
+    });
+  } catch (error) {
+    results.push({
+      test: 'URL modificada (sslmode=disable)',
+      success: false,
+      error: error.message
+    });
+  }
+  
+  // Teste 3: SSL com configuração permissiva
   try {
     console.log('Testando SSL permissivo...');
-    const testPool2 = new Pool({
+    const testPool3 = new Pool({
       connectionString: getDatabaseUrl(),
       ssl: {
         rejectUnauthorized: false,
@@ -341,13 +375,13 @@ app.get('/api/ssl-test', async (req, res) => {
       }
     });
     
-    const result2 = await testPool2.query('SELECT NOW() as current_time');
-    await testPool2.end();
+    const result3 = await testPool3.query('SELECT NOW() as current_time');
+    await testPool3.end();
     
     results.push({
       test: 'SSL permissivo',
       success: true,
-      currentTime: result2.rows[0].current_time
+      currentTime: result3.rows[0].current_time
     });
   } catch (error) {
     results.push({
@@ -357,25 +391,26 @@ app.get('/api/ssl-test', async (req, res) => {
     });
   }
   
-  // Teste 3: SSL com configuração mais permissiva
+  // Teste 4: SSL com configuração mais permissiva
   try {
     console.log('Testando SSL muito permissivo...');
-    const testPool3 = new Pool({
+    const testPool4 = new Pool({
       connectionString: getDatabaseUrl(),
       ssl: {
         rejectUnauthorized: false,
         checkServerIdentity: () => undefined,
-        secureProtocol: 'TLSv1_2_method'
+        secureProtocol: 'TLSv1_2_method',
+        ciphers: 'ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH'
       }
     });
     
-    const result3 = await testPool3.query('SELECT NOW() as current_time');
-    await testPool3.end();
+    const result4 = await testPool4.query('SELECT NOW() as current_time');
+    await testPool4.end();
     
     results.push({
       test: 'SSL muito permissivo',
       success: true,
-      currentTime: result3.rows[0].current_time
+      currentTime: result4.rows[0].current_time
     });
   } catch (error) {
     results.push({
@@ -407,6 +442,22 @@ app.get('/api/tables-test', async (req, res) => {
       AND table_type = 'BASE TABLE'
     `);
     
+    console.log('Tabelas encontradas:', tablesResult.rows.map(row => row.table_name));
+    
+    // Verificar estrutura da tabela users se existir
+    let usersTableStructure = null;
+    if (tablesResult.rows.some(row => row.table_name === 'users')) {
+      const structureResult = await pool.query(`
+        SELECT column_name, data_type, is_nullable 
+        FROM information_schema.columns 
+        WHERE table_name = 'users' 
+        AND table_schema = 'public'
+        ORDER BY ordinal_position
+      `);
+      usersTableStructure = structureResult.rows;
+      console.log('Estrutura da tabela users:', usersTableStructure);
+    }
+    
     // Tentar inserir um usuário de teste
     const testUser = await pool.query(`
       INSERT INTO users (name, email, password, created_at) 
@@ -418,6 +469,7 @@ app.get('/api/tables-test', async (req, res) => {
       success: true,
       message: 'Tabelas funcionando!',
       tables: tablesResult.rows.map(row => row.table_name),
+      usersTableStructure: usersTableStructure,
       testInsert: testUser.rows[0]
     });
   } catch (error) {
@@ -443,25 +495,34 @@ app.get('/api/auth/register', (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   try {
+    console.log('=== INÍCIO DO REGISTRO ===');
+    console.log('Body recebido:', req.body);
+    
     // Validação com Joi
+    console.log('Validando dados com Joi...');
     const { error, value } = userSchema.validate(req.body);
     if (error) {
+      console.log('Erro de validação:', error.details);
       return res.status(400).json({
         success: false,
         message: 'Dados inválidos',
         errors: error.details.map(detail => detail.message)
       });
     }
+    console.log('Dados validados:', value);
 
     const { name, email, password, phone, cpf } = value;
 
     // Verificar se email já existe
+    console.log('Verificando se email já existe...');
     const existingUser = await pool.query(
       'SELECT id FROM users WHERE email = $1',
       [email]
     );
+    console.log('Resultado da verificação de email:', existingUser.rows.length);
 
     if (existingUser.rows.length > 0) {
+      console.log('Email já cadastrado');
       return res.status(409).json({
         success: false,
         message: 'Email já cadastrado'
@@ -469,24 +530,31 @@ app.post('/api/auth/register', async (req, res) => {
     }
 
     // Hash da senha
+    console.log('Fazendo hash da senha...');
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
+    console.log('Hash da senha concluído');
 
     // Criar usuário no banco
+    console.log('Inserindo usuário no banco...');
     const result = await pool.query(
       'INSERT INTO users (name, email, password, phone, cpf, created_at) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id, name, email, phone, cpf, created_at',
       [name, email, hashedPassword, phone, cpf]
     );
+    console.log('Usuário inserido com sucesso:', result.rows[0]);
 
     const user = result.rows[0];
 
     // Gerar JWT token
+    console.log('Gerando JWT token...');
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       getJwtSecret(),
       { expiresIn: '24h' }
     );
+    console.log('JWT token gerado');
 
+    console.log('=== REGISTRO CONCLUÍDO COM SUCESSO ===');
     res.status(201).json({
       success: true,
       message: 'Usuário criado com sucesso!',
@@ -504,10 +572,15 @@ app.post('/api/auth/register', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Erro no registro:', error);
+    console.error('=== ERRO NO REGISTRO ===');
+    console.error('Erro completo:', error);
+    console.error('Stack trace:', error.stack);
+    console.error('Mensagem:', error.message);
     res.status(500).json({
       success: false,
-      message: 'Erro interno do servidor'
+      message: 'Erro interno do servidor',
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });
@@ -522,23 +595,32 @@ app.get('/api/auth/login', (req, res) => {
 
 app.post('/api/auth/login', async (req, res) => {
   try {
+    console.log('=== INÍCIO DO LOGIN ===');
+    console.log('Body recebido:', req.body);
+    
     const { email, password } = req.body;
 
     // Validação básica
+    console.log('Validando dados básicos...');
     if (!email || !password) {
+      console.log('Email ou senha não fornecidos');
       return res.status(400).json({
         success: false,
         message: 'Email e senha são obrigatórios'
       });
     }
+    console.log('Dados básicos validados');
 
     // Buscar usuário no banco
+    console.log('Buscando usuário no banco...');
     const result = await pool.query(
       'SELECT id, name, email, password, phone, cpf, created_at FROM users WHERE email = $1',
       [email]
     );
+    console.log('Resultado da busca:', result.rows.length, 'usuários encontrados');
 
     if (result.rows.length === 0) {
+      console.log('Usuário não encontrado');
       return res.status(401).json({
         success: false,
         message: 'Credenciais inválidas'
@@ -546,10 +628,15 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     const user = result.rows[0];
+    console.log('Usuário encontrado:', { id: user.id, email: user.email });
 
     // Verificar senha
+    console.log('Verificando senha...');
     const isValidPassword = await bcrypt.compare(password, user.password);
+    console.log('Senha válida:', isValidPassword);
+    
     if (!isValidPassword) {
+      console.log('Senha inválida');
       return res.status(401).json({
         success: false,
         message: 'Credenciais inválidas'
@@ -557,12 +644,15 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     // Gerar JWT token
+    console.log('Gerando JWT token...');
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       getJwtSecret(),
       { expiresIn: '24h' }
     );
+    console.log('JWT token gerado');
 
+    console.log('=== LOGIN CONCLUÍDO COM SUCESSO ===');
     res.status(200).json({
       success: true,
       message: 'Login realizado com sucesso!',
@@ -580,10 +670,15 @@ app.post('/api/auth/login', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Erro no login:', error);
+    console.error('=== ERRO NO LOGIN ===');
+    console.error('Erro completo:', error);
+    console.error('Stack trace:', error.stack);
+    console.error('Mensagem:', error.message);
     res.status(500).json({
       success: false,
-      message: 'Erro interno do servidor'
+      message: 'Erro interno do servidor',
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });
