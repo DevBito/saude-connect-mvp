@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "src/app.js": {
-      "maxDuration": 30
-    }
-  }
-}
