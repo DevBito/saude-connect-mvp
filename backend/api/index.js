@@ -48,7 +48,9 @@ const getJwtSecret = () => {
 const pool = new Pool({
   connectionString: getDatabaseUrl(),
   ssl: {
-    rejectUnauthorized: false
+    rejectUnauthorized: false,
+    checkServerIdentity: () => undefined,
+    secureProtocol: 'TLSv1_2_method'
   }
 });
 
@@ -185,6 +187,48 @@ app.get('/', (req, res) => {
   });
 });
 
+// API root endpoint
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Saúde Connect API',
+    version: '1.0.0',
+    status: 'OK',
+    endpoints: {
+      health: '/api/health',
+      test: '/api/test',
+      vars: '/api/vars',
+      dbTest: '/api/db-test',
+      sslTest: '/api/ssl-test',
+      auth: {
+        register: '/api/auth/register',
+        login: '/api/auth/login'
+      }
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
+// API root endpoint with trailing slash
+app.get('/api/', (req, res) => {
+  res.json({
+    message: 'Saúde Connect API',
+    version: '1.0.0',
+    status: 'OK',
+    endpoints: {
+      health: '/api/health',
+      test: '/api/test',
+      vars: '/api/vars',
+      dbTest: '/api/db-test',
+      sslTest: '/api/ssl-test',
+      auth: {
+        register: '/api/auth/register',
+        login: '/api/auth/login'
+      }
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 // API routes placeholder
 app.get('/api/test', (req, res) => {
   res.json({
@@ -259,37 +303,95 @@ app.get('/api/db-test', async (req, res) => {
 
 // Teste de conexão SSL específico
 app.get('/api/ssl-test', async (req, res) => {
+  const { Pool } = require('pg');
+  const results = [];
+  
+  // Teste 1: SSL desabilitado
   try {
-    console.log('Testando conexão SSL...');
-    
-    // Testar com SSL desabilitado primeiro
-    const { Pool } = require('pg');
-    const testPool = new Pool({
+    console.log('Testando SSL desabilitado...');
+    const testPool1 = new Pool({
       connectionString: getDatabaseUrl(),
       ssl: false
     });
     
-    const result = await testPool.query('SELECT NOW() as current_time');
-    await testPool.end();
+    const result1 = await testPool1.query('SELECT NOW() as current_time');
+    await testPool1.end();
     
-    res.json({
+    results.push({
+      test: 'SSL desabilitado',
       success: true,
-      message: 'Conexão SSL funcionando!',
-      database: {
-        connected: true,
-        currentTime: result.rows[0].current_time,
-        sslMode: 'SSL desabilitado'
-      }
+      currentTime: result1.rows[0].current_time
     });
   } catch (error) {
-    console.error('Erro na conexão SSL:', error);
-    res.status(500).json({
+    results.push({
+      test: 'SSL desabilitado',
       success: false,
-      message: 'Erro na conexão SSL',
-      error: error.message,
-      stack: error.stack
+      error: error.message
     });
   }
+  
+  // Teste 2: SSL com configuração permissiva
+  try {
+    console.log('Testando SSL permissivo...');
+    const testPool2 = new Pool({
+      connectionString: getDatabaseUrl(),
+      ssl: {
+        rejectUnauthorized: false,
+        checkServerIdentity: () => undefined
+      }
+    });
+    
+    const result2 = await testPool2.query('SELECT NOW() as current_time');
+    await testPool2.end();
+    
+    results.push({
+      test: 'SSL permissivo',
+      success: true,
+      currentTime: result2.rows[0].current_time
+    });
+  } catch (error) {
+    results.push({
+      test: 'SSL permissivo',
+      success: false,
+      error: error.message
+    });
+  }
+  
+  // Teste 3: SSL com configuração mais permissiva
+  try {
+    console.log('Testando SSL muito permissivo...');
+    const testPool3 = new Pool({
+      connectionString: getDatabaseUrl(),
+      ssl: {
+        rejectUnauthorized: false,
+        checkServerIdentity: () => undefined,
+        secureProtocol: 'TLSv1_2_method'
+      }
+    });
+    
+    const result3 = await testPool3.query('SELECT NOW() as current_time');
+    await testPool3.end();
+    
+    results.push({
+      test: 'SSL muito permissivo',
+      success: true,
+      currentTime: result3.rows[0].current_time
+    });
+  } catch (error) {
+    results.push({
+      test: 'SSL muito permissivo',
+      success: false,
+      error: error.message
+    });
+  }
+  
+  res.json({
+    message: 'Testes de conexão SSL',
+    results: results,
+    recommendation: results.find(r => r.success) ? 
+      `Use: ${results.find(r => r.success).test}` : 
+      'Nenhuma configuração SSL funcionou'
+  });
 });
 
 // Teste de tabelas

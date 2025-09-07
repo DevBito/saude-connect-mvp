@@ -6,7 +6,9 @@ dotenv.config()
 const pool = new Pool({
   connectionString: process.env.SAUDE_POSTGRES_URL,
   ssl: {
-    rejectUnauthorized: false
+    rejectUnauthorized: false,
+    checkServerIdentity: () => undefined,
+    secureProtocol: 'TLSv1_2_method'
   },
   max: 20,
   idleTimeoutMillis: 30000,
