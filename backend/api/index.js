@@ -110,6 +110,41 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Debug endpoint para verificar conexão com banco
+app.get('/debug', async (req, res) => {
+  try {
+    // Testar conexão com banco
+    const result = await pool.query('SELECT NOW() as current_time, version() as postgres_version');
+    
+    res.json({
+      success: true,
+      message: 'Conexão com banco funcionando!',
+      database: {
+        connected: true,
+        currentTime: result.rows[0].current_time,
+        version: result.rows[0].postgres_version
+      },
+      environment: {
+        NODE_ENV: process.env.NODE_ENV,
+        DATABASE_URL: process.env.DATABASE_URL ? 'Configurado' : 'Não configurado',
+        JWT_SECRET: process.env.JWT_SECRET ? 'Configurado' : 'Não configurado'
+      }
+    });
+  } catch (error) {
+    console.error('Erro na conexão com banco:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro na conexão com banco',
+      error: error.message,
+      environment: {
+        NODE_ENV: process.env.NODE_ENV,
+        DATABASE_URL: process.env.DATABASE_URL ? 'Configurado' : 'Não configurado',
+        JWT_SECRET: process.env.JWT_SECRET ? 'Configurado' : 'Não configurado'
+      }
+    });
+  }
+});
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
