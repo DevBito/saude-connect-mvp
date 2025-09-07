@@ -16,8 +16,26 @@ dotenv.config();
 const app = express();
 
 // Database connection
+const getDatabaseUrl = () => {
+  // Tentar URL completa primeiro
+  if (process.env.SAUDE_POSTGRES_URL) return process.env.SAUDE_POSTGRES_URL;
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  
+  // Construir URL a partir das variáveis individuais
+  const user = process.env.SAUDE_POSTGRES_USER;
+  const password = process.env.SAUDE_POSTGRES_PASSWORD;
+  const host = process.env.SAUDE_POSTGRES_HOST;
+  const database = process.env.SAUDE_POSTGRES_DATABASE;
+  
+  if (user && password && host && database) {
+    return `postgresql://${user}:${password}@${host}:5432/${database}?sslmode=require`;
+  }
+  
+  return null;
+};
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: getDatabaseUrl(),
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
@@ -91,7 +109,7 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ success: false, message: 'Token de acesso requerido' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key', (err, user) => {
+  jwt.verify(token, process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key', (err, user) => {
     if (err) {
       return res.status(403).json({ success: false, message: 'Token inválido' });
     }
@@ -126,8 +144,8 @@ app.get('/debug', async (req, res) => {
       },
       environment: {
         NODE_ENV: process.env.NODE_ENV,
-        DATABASE_URL: process.env.DATABASE_URL ? 'Configurado' : 'Não configurado',
-        JWT_SECRET: process.env.JWT_SECRET ? 'Configurado' : 'Não configurado'
+        DATABASE_URL: getDatabaseUrl() ? 'Configurado' : 'Não configurado',
+        JWT_SECRET: (process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET) ? 'Configurado' : 'Não configurado'
       }
     });
   } catch (error) {
@@ -138,8 +156,8 @@ app.get('/debug', async (req, res) => {
       error: error.message,
       environment: {
         NODE_ENV: process.env.NODE_ENV,
-        DATABASE_URL: process.env.DATABASE_URL ? 'Configurado' : 'Não configurado',
-        JWT_SECRET: process.env.JWT_SECRET ? 'Configurado' : 'Não configurado'
+        DATABASE_URL: getDatabaseUrl() ? 'Configurado' : 'Não configurado',
+        JWT_SECRET: (process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET) ? 'Configurado' : 'Não configurado'
       }
     });
   }
@@ -214,7 +232,7 @@ app.post('/api/auth/register', async (req, res) => {
     // Gerar JWT token
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      process.env.JWT_SECRET || 'fallback-secret-key',
+      process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
       { expiresIn: '24h' }
     );
 
@@ -290,7 +308,7 @@ app.post('/api/auth/login', async (req, res) => {
     // Gerar JWT token
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      process.env.JWT_SECRET || 'fallback-secret-key',
+      process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
       { expiresIn: '24h' }
     );
 
@@ -420,7 +438,7 @@ app.post('/api/professionals/register', async (req, res) => {
     // Gerar JWT token
     const token = jwt.sign(
       { professionalId: professional.id, email: professional.email },
-      process.env.JWT_SECRET || 'fallback-secret-key',
+      process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
       { expiresIn: '24h' }
     );
 
@@ -489,7 +507,7 @@ app.post('/api/professionals/login', async (req, res) => {
     // Gerar JWT token
     const token = jwt.sign(
       { professionalId: professional.id, email: professional.email },
-      process.env.JWT_SECRET || 'fallback-secret-key',
+      process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
       { expiresIn: '24h' }
     );
 
