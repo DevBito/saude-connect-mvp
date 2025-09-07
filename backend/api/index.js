@@ -48,9 +48,7 @@ const getJwtSecret = () => {
 const pool = new Pool({
   connectionString: getDatabaseUrl(),
   ssl: {
-    rejectUnauthorized: false,
-    require: true,
-    checkServerIdentity: () => undefined
+    rejectUnauthorized: false
   }
 });
 
@@ -224,6 +222,9 @@ app.get('/api/vars', (req, res) => {
 app.get('/api/db-test', async (req, res) => {
   try {
     console.log('Testando conexão com banco...');
+    console.log('Database URL:', getDatabaseUrl() ? 'Configurado' : 'Não configurado');
+    console.log('NODE_ENV:', process.env.NODE_ENV);
+    
     const result = await pool.query('SELECT NOW() as current_time, version() as postgres_version');
     
     res.json({
@@ -233,6 +234,11 @@ app.get('/api/db-test', async (req, res) => {
         connected: true,
         currentTime: result.rows[0].current_time,
         version: result.rows[0].postgres_version
+      },
+      config: {
+        nodeEnv: process.env.NODE_ENV,
+        databaseUrl: getDatabaseUrl() ? 'Configurado' : 'Não configurado',
+        sslConfig: process.env.NODE_ENV === 'production' ? 'SSL habilitado' : 'SSL desabilitado'
       }
     });
   } catch (error) {
@@ -240,6 +246,46 @@ app.get('/api/db-test', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro na conexão com banco',
+      error: error.message,
+      stack: error.stack,
+      config: {
+        nodeEnv: process.env.NODE_ENV,
+        databaseUrl: getDatabaseUrl() ? 'Configurado' : 'Não configurado',
+        sslConfig: process.env.NODE_ENV === 'production' ? 'SSL habilitado' : 'SSL desabilitado'
+      }
+    });
+  }
+});
+
+// Teste de conexão SSL específico
+app.get('/api/ssl-test', async (req, res) => {
+  try {
+    console.log('Testando conexão SSL...');
+    
+    // Testar com SSL desabilitado primeiro
+    const { Pool } = require('pg');
+    const testPool = new Pool({
+      connectionString: getDatabaseUrl(),
+      ssl: false
+    });
+    
+    const result = await testPool.query('SELECT NOW() as current_time');
+    await testPool.end();
+    
+    res.json({
+      success: true,
+      message: 'Conexão SSL funcionando!',
+      database: {
+        connected: true,
+        currentTime: result.rows[0].current_time,
+        sslMode: 'SSL desabilitado'
+      }
+    });
+  } catch (error) {
+    console.error('Erro na conexão SSL:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro na conexão SSL',
       error: error.message,
       stack: error.stack
     });
