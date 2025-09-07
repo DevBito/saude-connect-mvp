@@ -17,17 +17,13 @@ const app = express();
 
 // Database connection
 const getDatabaseUrl = () => {
-  // Tentar URL completa primeiro
+  // Usar SAUDE_POSTGRES_URL como principal
   if (process.env.SAUDE_POSTGRES_URL) {
     console.log('✅ Usando SAUDE_POSTGRES_URL');
     return process.env.SAUDE_POSTGRES_URL;
   }
-  if (process.env.DATABASE_URL) {
-    console.log('✅ Usando DATABASE_URL');
-    return process.env.DATABASE_URL;
-  }
   
-  // Construir URL a partir das variáveis individuais
+  // Construir URL a partir das variáveis individuais como fallback
   const user = process.env.SAUDE_POSTGRES_USER;
   const password = process.env.SAUDE_POSTGRES_PASSWORD;
   const host = process.env.SAUDE_POSTGRES_HOST;
@@ -46,8 +42,6 @@ const getDatabaseUrl = () => {
 // JWT Secret
 const getJwtSecret = () => {
   return process.env.SAUDE_SUPABASE_JWT_SECRET || 
-         process.env.SAUDE_JWT_SECRET || 
-         process.env.JWT_SECRET || 
          'fallback-secret-key';
 };
 
@@ -164,8 +158,8 @@ app.get('/debug', async (req, res) => {
       },
       environment: {
         NODE_ENV: process.env.NODE_ENV,
-        DATABASE_URL: getDatabaseUrl() ? 'Configurado' : 'Não configurado',
-        JWT_SECRET: (process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET) ? 'Configurado' : 'Não configurado'
+        SAUDE_POSTGRES_URL: getDatabaseUrl() ? 'Configurado' : 'Não configurado',
+        SAUDE_SUPABASE_JWT_SECRET: process.env.SAUDE_SUPABASE_JWT_SECRET ? 'Configurado' : 'Não configurado'
       }
     });
   } catch (error) {
@@ -176,8 +170,8 @@ app.get('/debug', async (req, res) => {
       error: error.message,
       environment: {
         NODE_ENV: process.env.NODE_ENV,
-        DATABASE_URL: getDatabaseUrl() ? 'Configurado' : 'Não configurado',
-        JWT_SECRET: (process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET) ? 'Configurado' : 'Não configurado'
+        SAUDE_POSTGRES_URL: getDatabaseUrl() ? 'Configurado' : 'Não configurado',
+        SAUDE_SUPABASE_JWT_SECRET: process.env.SAUDE_SUPABASE_JWT_SECRET ? 'Configurado' : 'Não configurado'
       }
     });
   }
@@ -206,16 +200,22 @@ app.get('/api/vars', (req, res) => {
     message: 'Variáveis de ambiente',
     vars: {
       NODE_ENV: process.env.NODE_ENV,
+      SAUDE_POSTGRES_URL: process.env.SAUDE_POSTGRES_URL ? 'Configurado' : 'Não configurado',
+      SAUDE_POSTGRES_PRISMA_URL: process.env.SAUDE_POSTGRES_PRISMA_URL ? 'Configurado' : 'Não configurado',
+      SAUDE_SUPABASE_URL: process.env.SAUDE_SUPABASE_URL ? 'Configurado' : 'Não configurado',
+      SAUDE_NEXT_PUBLIC_SUPABASE_URL: process.env.SAUDE_NEXT_PUBLIC_SUPABASE_URL ? 'Configurado' : 'Não configurado',
+      SAUDE_POSTGRES_URL_NON_POOLING: process.env.SAUDE_POSTGRES_URL_NON_POOLING ? 'Configurado' : 'Não configurado',
+      SAUDE_SUPABASE_JWT_SECRET: process.env.SAUDE_SUPABASE_JWT_SECRET ? 'Configurado' : 'Não configurado',
       SAUDE_POSTGRES_USER: process.env.SAUDE_POSTGRES_USER ? 'Configurado' : 'Não configurado',
+      SAUDE_NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.SAUDE_NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Configurado' : 'Não configurado',
       SAUDE_POSTGRES_PASSWORD: process.env.SAUDE_POSTGRES_PASSWORD ? 'Configurado' : 'Não configurado',
-      SAUDE_POSTGRES_HOST: process.env.SAUDE_POSTGRES_HOST ? 'Configurado' : 'Não configurado',
       SAUDE_POSTGRES_DATABASE: process.env.SAUDE_POSTGRES_DATABASE ? 'Configurado' : 'Não configurado',
-      SAUDE_JWT_SECRET: process.env.SAUDE_SUPABASE_JWT_SECRET ? 'Configurado' : 'Não configurado',
-      DATABASE_URL: process.env.DATABASE_URL ? 'Configurado' : 'Não configurado',
-      JWT_SECRET: process.env.JWT_SECRET ? 'Configurado' : 'Não configurado',
-      JWT_SECRET_FINAL: getJwtSecret() !== 'fallback-secret-key' ? 'Configurado' : 'Não configurado'
+      SAUDE_SUPABASE_SERVICE_ROLE_KEY: process.env.SAUDE_SUPABASE_SERVICE_ROLE_KEY ? 'Configurado' : 'Não configurado',
+      SAUDE_POSTGRES_HOST: process.env.SAUDE_POSTGRES_HOST ? 'Configurado' : 'Não configurado',
+      FRONTEND_URL: process.env.FRONTEND_URL ? 'Configurado' : 'Não configurado'
     },
-    databaseUrl: getDatabaseUrl() ? 'URL construída com sucesso' : 'Falha ao construir URL'
+    databaseUrl: getDatabaseUrl() ? 'URL construída com sucesso' : 'Falha ao construir URL',
+    jwtSecret: getJwtSecret() !== 'fallback-secret-key' ? 'Configurado' : 'Não configurado'
   });
 });
 

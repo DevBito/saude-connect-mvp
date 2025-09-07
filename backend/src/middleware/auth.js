@@ -13,7 +13,7 @@ const authenticateToken = async (req, res, next) => {
       })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = jwt.verify(token, process.env.SAUDE_SUPABASE_JWT_SECRET)
     
     // Buscar usuário no banco de dados
     const userQuery = `

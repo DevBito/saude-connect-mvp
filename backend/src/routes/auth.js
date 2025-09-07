@@ -32,7 +32,7 @@ const changePasswordSchema = Joi.object({
 const generateToken = (userId) => {
   return jwt.sign(
     { userId },
-    process.env.JWT_SECRET,
+    process.env.SAUDE_SUPABASE_JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   )
 }
