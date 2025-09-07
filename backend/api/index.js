@@ -17,26 +17,38 @@ const app = express();
 
 // Database connection
 const getDatabaseUrl = () => {
+  let databaseUrl = null;
+  
   // Usar SAUDE_POSTGRES_URL como principal
   if (process.env.SAUDE_POSTGRES_URL) {
     console.log('✅ Usando SAUDE_POSTGRES_URL');
-    return process.env.SAUDE_POSTGRES_URL;
+    databaseUrl = process.env.SAUDE_POSTGRES_URL;
+  } else {
+    // Construir URL a partir das variáveis individuais como fallback
+    const user = process.env.SAUDE_POSTGRES_USER;
+    const password = process.env.SAUDE_POSTGRES_PASSWORD;
+    const host = process.env.SAUDE_POSTGRES_HOST;
+    const database = process.env.SAUDE_POSTGRES_DATABASE;
+    
+    if (user && password && host && database) {
+      databaseUrl = `postgresql://${user}:${password}@${host}:5432/${database}`;
+      console.log('✅ Construindo URL a partir de variáveis individuais');
+    }
   }
   
-  // Construir URL a partir das variáveis individuais como fallback
-  const user = process.env.SAUDE_POSTGRES_USER;
-  const password = process.env.SAUDE_POSTGRES_PASSWORD;
-  const host = process.env.SAUDE_POSTGRES_HOST;
-  const database = process.env.SAUDE_POSTGRES_DATABASE;
-  
-  if (user && password && host && database) {
-    const constructedUrl = `postgresql://${user}:${password}@${host}:5432/${database}?sslmode=require`;
-    console.log('✅ Construindo URL a partir de variáveis individuais');
-    return constructedUrl;
+  if (!databaseUrl) {
+    console.log('❌ Nenhuma variável de banco encontrada');
+    return null;
   }
   
-  console.log('❌ Nenhuma variável de banco encontrada');
-  return null;
+  // Forçar SSL desabilitado
+  console.log('🔧 Forçando SSL desabilitado...');
+  databaseUrl = databaseUrl.replace(/[?&]sslmode=[^&]*/g, '');
+  databaseUrl = databaseUrl.replace(/[?&]ssl=[^&]*/g, '');
+  databaseUrl += (databaseUrl.includes('?') ? '&' : '?') + 'sslmode=disable';
+  
+  console.log('✅ URL final com SSL desabilitado');
+  return databaseUrl;
 };
 
 // JWT Secret
@@ -46,13 +58,7 @@ const getJwtSecret = () => {
 };
 
 const pool = new Pool({
-  connectionString: getDatabaseUrl(),
-  ssl: {
-    rejectUnauthorized: false,
-    checkServerIdentity: () => undefined,
-    secureProtocol: 'TLSv1_2_method',
-    ciphers: 'ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH'
-  }
+  connectionString: getDatabaseUrl()
 });
 
 // Test database connection
@@ -391,10 +397,33 @@ app.get('/api/ssl-test', async (req, res) => {
     });
   }
   
-  // Teste 4: SSL com configuração mais permissiva
+  // Teste 4: Sem configuração SSL (padrão)
+  try {
+    console.log('Testando sem configuração SSL...');
+    const testPool4 = new Pool({
+      connectionString: getDatabaseUrl()
+    });
+    
+    const result4 = await testPool4.query('SELECT NOW() as current_time');
+    await testPool4.end();
+    
+    results.push({
+      test: 'Sem configuração SSL (padrão)',
+      success: true,
+      currentTime: result4.rows[0].current_time
+    });
+  } catch (error) {
+    results.push({
+      test: 'Sem configuração SSL (padrão)',
+      success: false,
+      error: error.message
+    });
+  }
+  
+  // Teste 5: SSL com configuração mais permissiva
   try {
     console.log('Testando SSL muito permissivo...');
-    const testPool4 = new Pool({
+    const testPool5 = new Pool({
       connectionString: getDatabaseUrl(),
       ssl: {
         rejectUnauthorized: false,
@@ -404,13 +433,13 @@ app.get('/api/ssl-test', async (req, res) => {
       }
     });
     
-    const result4 = await testPool4.query('SELECT NOW() as current_time');
-    await testPool4.end();
+    const result5 = await testPool5.query('SELECT NOW() as current_time');
+    await testPool5.end();
     
     results.push({
       test: 'SSL muito permissivo',
       success: true,
-      currentTime: result4.rows[0].current_time
+      currentTime: result5.rows[0].current_time
     });
   } catch (error) {
     results.push({
