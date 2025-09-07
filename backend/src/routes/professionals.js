@@ -1,5 +1,5 @@
-import express from 'express'
-import pool from '../config/database.js'
+const express = require('express')
+const pool = require('../config/database.js')
 
 const router = express.Router()
 
@@ -251,4 +251,4 @@ router.get('/:id/reviews', async (req, res, next) => {
   }
 })
 
-export default router
+module.exports = router

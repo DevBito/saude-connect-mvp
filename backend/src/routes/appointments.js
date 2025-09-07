@@ -1,6 +1,6 @@
-import express from 'express'
-import { authenticateToken } from '../middleware/auth.js'
-import pool from '../config/database.js'
+const express = require('express')
+const { authenticateToken } = require('../middleware/auth.js')
+const pool = require('../config/database.js')
 
 const router = express.Router()
 
@@ -323,4 +323,4 @@ router.delete('/:id', authenticateToken, async (req, res, next) => {
   }
 })
 
-export default router
+module.exports = router

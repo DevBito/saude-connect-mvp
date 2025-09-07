@@ -1,4 +1,4 @@
-export const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, next) => {
   console.error('Erro capturado:', err)
 
   // Erro de validação do Joi
@@ -66,3 +66,5 @@ export const errorHandler = (err, req, res, next) => {
     ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
   })
 }
+
+module.exports = { errorHandler }

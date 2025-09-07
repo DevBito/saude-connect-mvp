@@ -1,21 +1,21 @@
-import express from 'express'
-import cors from 'cors'
-import helmet from 'helmet'
-import compression from 'compression'
-import morgan from 'morgan'
-import rateLimit from 'express-rate-limit'
-import dotenv from 'dotenv'
+const express = require('express')
+const cors = require('cors')
+const helmet = require('helmet')
+const compression = require('compression')
+const morgan = require('morgan')
+const rateLimit = require('express-rate-limit')
+const dotenv = require('dotenv')
 
 // Import routes
-import authRoutes from './routes/auth.js'
-import userRoutes from './routes/users.js'
-import professionalRoutes from './routes/professionals.js'
-import appointmentRoutes from './routes/appointments.js'
-import adminRoutes from './routes/admin.js'
+const authRoutes = require('./routes/auth.js')
+const userRoutes = require('./routes/users.js')
+const professionalRoutes = require('./routes/professionals.js')
+const appointmentRoutes = require('./routes/appointments.js')
+const adminRoutes = require('./routes/admin.js')
 
 // Import middleware
-import { errorHandler } from './middleware/errorHandler.js'
-import { notFound } from './middleware/notFound.js'
+const { errorHandler } = require('./middleware/errorHandler.js')
+const { notFound } = require('./middleware/notFound.js')
 
 // Load environment variables
 dotenv.config()
@@ -93,4 +93,4 @@ if (process.env.NODE_ENV !== 'test') {
   })
 }
 
-export default app
+module.exports = app

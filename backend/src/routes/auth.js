@@ -1,9 +1,9 @@
-import express from 'express'
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
-import Joi from 'joi'
-import pool from '../config/database.js'
-import { authenticateToken } from '../middleware/auth.js'
+const express = require('express')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const Joi = require('joi')
+const pool = require('../config/database.js')
+const { authenticateToken } = require('../middleware/auth.js')
 
 const router = express.Router()
 
@@ -363,4 +363,4 @@ router.put('/change-password', authenticateToken, async (req, res, next) => {
   }
 })
 
-export default router
+module.exports = router

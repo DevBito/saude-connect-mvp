@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken'
-import pool from '../config/database.js'
+const jwt = require('jsonwebtoken')
+const pool = require('../config/database.js')
 
-export const authenticateToken = async (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1] // Bearer TOKEN
@@ -55,7 +55,7 @@ export const authenticateToken = async (req, res, next) => {
   }
 }
 
-export const requireAdmin = (req, res, next) => {
+const requireAdmin = (req, res, next) => {
   if (req.user.role !== 'admin') {
     return res.status(403).json({
       success: false,
@@ -65,7 +65,7 @@ export const requireAdmin = (req, res, next) => {
   next()
 }
 
-export const requireEmailVerification = (req, res, next) => {
+const requireEmailVerification = (req, res, next) => {
   if (!req.user.email_verified) {
     return res.status(403).json({
       success: false,
@@ -74,3 +74,5 @@ export const requireEmailVerification = (req, res, next) => {
   }
   next()
 }
+
+module.exports = { authenticateToken, requireAdmin, requireEmailVerification }

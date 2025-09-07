@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Backend API para o sistema Saúde Connect",
   "main": "src/app.js",
-  "type": "module",
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
