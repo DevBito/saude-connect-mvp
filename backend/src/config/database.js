@@ -14,11 +14,20 @@ const getDatabaseUrl = () => {
   
   // Forçar SSL desabilitado
   console.log('🔧 Forçando SSL desabilitado...');
+  console.log('URL original:', databaseUrl);
+  
+  // Remover parâmetros SSL existentes de forma mais cuidadosa
   databaseUrl = databaseUrl.replace(/[?&]sslmode=[^&]*/g, '');
   databaseUrl = databaseUrl.replace(/[?&]ssl=[^&]*/g, '');
-  databaseUrl += (databaseUrl.includes('?') ? '&' : '?') + 'sslmode=disable';
   
-  console.log('✅ URL final com SSL desabilitado');
+  // Adicionar sslmode=disable
+  if (databaseUrl.includes('?')) {
+    databaseUrl += '&sslmode=disable';
+  } else {
+    databaseUrl += '?sslmode=disable';
+  }
+  
+  console.log('✅ URL final com SSL desabilitado:', databaseUrl);
   return databaseUrl;
 }
 

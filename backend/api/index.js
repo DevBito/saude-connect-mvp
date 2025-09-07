@@ -43,11 +43,20 @@ const getDatabaseUrl = () => {
   
   // Forçar SSL desabilitado
   console.log('🔧 Forçando SSL desabilitado...');
+  console.log('URL original:', databaseUrl);
+  
+  // Remover parâmetros SSL existentes de forma mais cuidadosa
   databaseUrl = databaseUrl.replace(/[?&]sslmode=[^&]*/g, '');
   databaseUrl = databaseUrl.replace(/[?&]ssl=[^&]*/g, '');
-  databaseUrl += (databaseUrl.includes('?') ? '&' : '?') + 'sslmode=disable';
   
-  console.log('✅ URL final com SSL desabilitado');
+  // Adicionar sslmode=disable
+  if (databaseUrl.includes('?')) {
+    databaseUrl += '&sslmode=disable';
+  } else {
+    databaseUrl += '?sslmode=disable';
+  }
+  
+  console.log('✅ URL final com SSL desabilitado:', databaseUrl);
   return databaseUrl;
 };
 
@@ -246,6 +255,9 @@ app.get('/api/test', (req, res) => {
 
 // Teste simples de variáveis
 app.get('/api/vars', (req, res) => {
+  const originalUrl = process.env.SAUDE_POSTGRES_URL;
+  const modifiedUrl = getDatabaseUrl();
+  
   res.json({
     message: 'Variáveis de ambiente',
     vars: {
@@ -264,7 +276,12 @@ app.get('/api/vars', (req, res) => {
       SAUDE_POSTGRES_HOST: process.env.SAUDE_POSTGRES_HOST ? 'Configurado' : 'Não configurado',
       FRONTEND_URL: process.env.FRONTEND_URL ? 'Configurado' : 'Não configurado'
     },
-    databaseUrl: getDatabaseUrl() ? 'URL construída com sucesso' : 'Falha ao construir URL',
+    databaseUrl: {
+      original: originalUrl ? 'Configurado' : 'Não configurado',
+      modified: modifiedUrl ? 'URL construída com sucesso' : 'Falha ao construir URL',
+      originalUrl: originalUrl ? originalUrl.substring(0, 50) + '...' : null,
+      modifiedUrl: modifiedUrl ? modifiedUrl.substring(0, 50) + '...' : null
+    },
     jwtSecret: getJwtSecret() !== 'fallback-secret-key' ? 'Configurado' : 'Não configurado'
   });
 });
