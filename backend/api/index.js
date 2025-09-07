@@ -56,7 +56,13 @@ const getJwtSecret = () => {
 
 const pool = new Pool({
   connectionString: getDatabaseUrl(),
-  ssl: false
+  ssl: false,
+  max: 5, // REDUZIDO: Máximo 5 conexões simultâneas
+  min: 1, // Mínimo 1 conexão
+  idleTimeoutMillis: 10000, // REDUZIDO: 10 segundos
+  connectionTimeoutMillis: 5000, // AUMENTADO: 5 segundos
+  acquireTimeoutMillis: 10000, // Timeout para adquirir conexão
+  allowExitOnIdle: true, // Permitir saída quando idle
 });
 
 // Test database connection
@@ -145,6 +151,23 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Pool status endpoint
+app.get('/api/pool-status', (req, res) => {
+  res.json({
+    message: 'Status do pool de conexões',
+    pool: {
+      totalCount: pool.totalCount,
+      idleCount: pool.idleCount,
+      waitingCount: pool.waitingCount,
+      max: pool.options.max,
+      min: pool.options.min,
+      idleTimeoutMillis: pool.options.idleTimeoutMillis,
+      connectionTimeoutMillis: pool.options.connectionTimeoutMillis
+    },
+    timestamp: new Date().toISOString()
   });
 });
 

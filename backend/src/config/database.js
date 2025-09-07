@@ -38,9 +38,12 @@ const getDatabaseUrl = () => {
 const pool = new Pool({
   connectionString: getDatabaseUrl(),
   ssl: false,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  max: 5, // REDUZIDO: Máximo 5 conexões simultâneas
+  min: 1, // Mínimo 1 conexão
+  idleTimeoutMillis: 10000, // REDUZIDO: 10 segundos
+  connectionTimeoutMillis: 5000, // AUMENTADO: 5 segundos
+  acquireTimeoutMillis: 10000, // Timeout para adquirir conexão
+  allowExitOnIdle: true, // Permitir saída quando idle
 })
 
 // Test database connection
