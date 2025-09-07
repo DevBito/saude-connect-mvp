@@ -197,6 +197,145 @@ app.get('/api/test-auth', authenticateToken, (req, res) => {
   });
 });
 
+// Test appointments endpoint
+app.get('/api/test-appointments', authenticateToken, async (req, res) => {
+  try {
+    console.log('🧪 Teste de appointments - userId:', req.user.userId);
+    
+    // Verificar se o usuário existe
+    const userResult = await pool.query('SELECT id, name, email FROM users WHERE id = $1', [req.user.userId]);
+    console.log('👤 Usuário encontrado:', userResult.rows[0]);
+    
+    // Verificar appointments
+    const appointmentsResult = await pool.query('SELECT COUNT(*) as total FROM appointments WHERE patient_id = $1', [req.user.userId]);
+    console.log('📅 Total de appointments:', appointmentsResult.rows[0].total);
+    
+    res.json({
+      success: true,
+      message: 'Teste de appointments funcionando',
+      user: userResult.rows[0],
+      appointmentsCount: appointmentsResult.rows[0].total,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Erro no teste de appointments:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro no teste',
+      error: error.message
+    });
+  }
+});
+
+// Endpoint simples para testar autenticação
+app.get('/api/simple-test', authenticateToken, (req, res) => {
+  res.json({
+    success: true,
+    message: 'Autenticação simples funcionando',
+    userId: req.user.userId,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Endpoint temporário com dados mockados
+app.get('/api/appointments-mock', authenticateToken, (req, res) => {
+  console.log('🎭 Retornando dados mockados para userId:', req.user.userId);
+  
+  const mockAppointments = [
+    {
+      id: 1,
+      patient_id: req.user.userId,
+      professional_id: 1,
+      professional_name: 'Dr. João Silva',
+      specialty: 'Cardiologia',
+      date: '2024-01-15',
+      time: '14:00:00',
+      notes: 'Consulta de rotina',
+      status: 'scheduled',
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 2,
+      patient_id: req.user.userId,
+      professional_id: 2,
+      professional_name: 'Dra. Maria Santos',
+      specialty: 'Dermatologia',
+      date: '2024-01-20',
+      time: '10:30:00',
+      notes: 'Exame de pele',
+      status: 'confirmed',
+      created_at: new Date().toISOString()
+    }
+  ];
+  
+  res.json({
+    success: true,
+    data: mockAppointments
+  });
+});
+
+// Endpoint para inserir dados de teste
+app.post('/api/seed-professionals', async (req, res) => {
+  try {
+    console.log('🌱 Inserindo dados de teste para profissionais...');
+    
+    const testProfessionals = [
+      {
+        name: 'Dr. João Silva',
+        email: 'joao.silva@exemplo.com',
+        password: '$2b$10$example', // Hash de exemplo
+        specialty: 'Cardiologia',
+        crm: 'CRM-SP 123456',
+        phone: '(11) 99999-1111'
+      },
+      {
+        name: 'Dra. Maria Santos',
+        email: 'maria.santos@exemplo.com',
+        password: '$2b$10$example',
+        specialty: 'Dermatologia',
+        crm: 'CRM-SP 789012',
+        phone: '(11) 99999-2222'
+      },
+      {
+        name: 'Dr. Pedro Costa',
+        email: 'pedro.costa@exemplo.com',
+        password: '$2b$10$example',
+        specialty: 'Ginecologia',
+        crm: 'CRM-SP 345678',
+        phone: '(11) 99999-3333'
+      },
+      {
+        name: 'Dra. Ana Oliveira',
+        email: 'ana.oliveira@exemplo.com',
+        password: '$2b$10$example',
+        specialty: 'Pediatria',
+        crm: 'CRM-SP 901234',
+        phone: '(11) 99999-4444'
+      }
+    ];
+
+    for (const professional of testProfessionals) {
+      await pool.query(
+        'INSERT INTO professionals (name, email, password, specialty, crm, phone, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) ON CONFLICT (email) DO NOTHING',
+        [professional.name, professional.email, professional.password, professional.specialty, professional.crm, professional.phone]
+      );
+    }
+
+    res.json({
+      success: true,
+      message: 'Dados de teste inseridos com sucesso'
+    });
+
+  } catch (error) {
+    console.error('❌ Erro ao inserir dados de teste:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao inserir dados de teste',
+      error: error.message
+    });
+  }
+});
+
 // Debug endpoint para verificar conexão com banco
 app.get('/debug', async (req, res) => {
   try {
@@ -1102,9 +1241,41 @@ app.post('/api/professionals/login', async (req, res) => {
 // Listar profissionais
 app.get('/api/professionals', async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT id, name, specialty, crm, phone, created_at FROM professionals ORDER BY name'
-    );
+    console.log('👨‍⚕️ Buscando profissionais com filtros:', req.query);
+    
+    let query = 'SELECT id, name, specialty, crm, phone, created_at FROM professionals WHERE 1=1';
+    const params = [];
+    let paramCount = 0;
+
+    // Filtro por especialidade
+    if (req.query.specialty) {
+      paramCount++;
+      query += ` AND specialty ILIKE $${paramCount}`;
+      params.push(`%${req.query.specialty}%`);
+    }
+
+    // Filtro por busca (nome)
+    if (req.query.search) {
+      paramCount++;
+      query += ` AND name ILIKE $${paramCount}`;
+      params.push(`%${req.query.search}%`);
+    }
+
+    // Filtro por localização (se implementado)
+    if (req.query.location) {
+      paramCount++;
+      query += ` AND (city ILIKE $${paramCount} OR state ILIKE $${paramCount})`;
+      params.push(`%${req.query.location}%`);
+    }
+
+    query += ' ORDER BY name';
+
+    console.log('🔍 Query final:', query);
+    console.log('📋 Parâmetros:', params);
+
+    const result = await pool.query(query, params);
+
+    console.log('👨‍⚕️ Profissionais encontrados:', result.rows.length);
 
     res.json({
       success: true,
@@ -1112,10 +1283,11 @@ app.get('/api/professionals', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Erro ao listar profissionais:', error);
+    console.error('❌ Erro ao listar profissionais:', error);
     res.status(500).json({
       success: false,
-      message: 'Erro interno do servidor'
+      message: 'Erro interno do servidor',
+      error: error.message
     });
   }
 });
@@ -1174,14 +1346,18 @@ app.post('/api/appointments', authenticateToken, async (req, res) => {
 // Listar consultas do usuário
 app.get('/api/appointments', authenticateToken, async (req, res) => {
   try {
+    console.log('📅 Buscando appointments para userId:', req.user.userId);
+    
     const result = await pool.query(
       `SELECT a.*, p.name as professional_name, p.specialty 
        FROM appointments a 
-       JOIN professionals p ON a.professional_id = p.id 
+       LEFT JOIN professionals p ON a.professional_id = p.id 
        WHERE a.patient_id = $1 
        ORDER BY a.date, a.time`,
       [req.user.userId]
     );
+
+    console.log('📅 Appointments encontrados:', result.rows.length);
 
     res.json({
       success: true,
@@ -1189,10 +1365,11 @@ app.get('/api/appointments', authenticateToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Erro ao listar consultas:', error);
+    console.error('❌ Erro ao listar consultas:', error);
     res.status(500).json({
       success: false,
-      message: 'Erro interno do servidor'
+      message: 'Erro interno do servidor',
+      error: error.message
     });
   }
 });
