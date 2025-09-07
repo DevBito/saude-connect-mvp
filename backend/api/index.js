@@ -135,17 +135,27 @@ const appointmentSchema = Joi.object({
 
 // Middleware de autenticação
 const authenticateToken = (req, res, next) => {
+  console.log('🔐 Middleware de autenticação - Iniciando...');
+  console.log('📋 Headers recebidos:', req.headers);
+  
   const authHeader = req.headers['authorization'];
+  console.log('🔑 Authorization header:', authHeader);
+  
   const token = authHeader && authHeader.split(' ')[1];
+  console.log('🎫 Token extraído:', token ? 'Token presente' : 'Token ausente');
 
   if (!token) {
+    console.log('❌ Token não encontrado - retornando 401');
     return res.status(401).json({ success: false, message: 'Token de acesso requerido' });
   }
 
+  console.log('🔍 Verificando token com JWT secret...');
   jwt.verify(token, getJwtSecret(), (err, user) => {
     if (err) {
-      return res.status(403).json({ success: false, message: 'Token inválido' });
+      console.log('❌ Erro na verificação do token:', err.message);
+      return res.status(403).json({ success: false, message: 'Token inválido', error: err.message });
     }
+    console.log('✅ Token válido - usuário:', user);
     req.user = user;
     next();
   });
@@ -174,6 +184,15 @@ app.get('/api/pool-status', (req, res) => {
       idleTimeoutMillis: pool.options.idleTimeoutMillis,
       connectionTimeoutMillis: pool.options.connectionTimeoutMillis
     },
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Test authentication endpoint
+app.get('/api/test-auth', authenticateToken, (req, res) => {
+  res.json({
+    message: 'Autenticação funcionando!',
+    user: req.user,
     timestamp: new Date().toISOString()
   });
 });

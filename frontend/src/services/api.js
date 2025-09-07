@@ -15,12 +15,22 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
+    console.log('🔑 Token no localStorage:', token ? 'Token presente' : 'Token ausente')
+    console.log('📡 URL da requisição:', config.url)
+    console.log('📋 Headers antes:', config.headers)
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+      console.log('✅ Token adicionado aos headers')
+    } else {
+      console.log('❌ Token não encontrado no localStorage')
     }
+    
+    console.log('📋 Headers depois:', config.headers)
     return config
   },
   (error) => {
+    console.log('❌ Erro no interceptor de request:', error)
     return Promise.reject(error)
   }
 )
