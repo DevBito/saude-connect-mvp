@@ -207,6 +207,69 @@ app.get('/api/vars', (req, res) => {
   });
 });
 
+// Teste de conexão com banco
+app.get('/api/db-test', async (req, res) => {
+  try {
+    console.log('Testando conexão com banco...');
+    const result = await pool.query('SELECT NOW() as current_time, version() as postgres_version');
+    
+    res.json({
+      success: true,
+      message: 'Conexão com banco funcionando!',
+      database: {
+        connected: true,
+        currentTime: result.rows[0].current_time,
+        version: result.rows[0].postgres_version
+      }
+    });
+  } catch (error) {
+    console.error('Erro na conexão com banco:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro na conexão com banco',
+      error: error.message,
+      stack: error.stack
+    });
+  }
+});
+
+// Teste de tabelas
+app.get('/api/tables-test', async (req, res) => {
+  try {
+    console.log('Testando tabelas...');
+    
+    // Verificar se tabelas existem
+    const tablesResult = await pool.query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      AND table_type = 'BASE TABLE'
+    `);
+    
+    // Tentar inserir um usuário de teste
+    const testUser = await pool.query(`
+      INSERT INTO users (name, email, password, created_at) 
+      VALUES ($1, $2, $3, NOW()) 
+      RETURNING id, name, email, created_at
+    `, ['Teste', 'teste@exemplo.com', 'senha123']);
+    
+    res.json({
+      success: true,
+      message: 'Tabelas funcionando!',
+      tables: tablesResult.rows.map(row => row.table_name),
+      testInsert: testUser.rows[0]
+    });
+  } catch (error) {
+    console.error('Erro nas tabelas:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro nas tabelas',
+      error: error.message,
+      stack: error.stack
+    });
+  }
+});
+
 // ===== AUTH ROUTES =====
 
 app.get('/api/auth/register', (req, res) => {
