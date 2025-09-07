@@ -1,16 +1,27 @@
 :root {
-  /* Colors */
-  --primary-50: #f8fafc;
-  --primary-100: #f1f5f9;
-  --primary-500: #64748b;
-  --primary-600: #475569;
-  --primary-700: #334155;
+  /* Colors - Health Theme */
+  --primary-50: #f0fdf4;
+  --primary-100: #dcfce7;
+  --primary-500: #22c55e;
+  --primary-600: #16a34a;
+  --primary-700: #15803d;
   
-  --secondary-50: #f8fafc;
-  --secondary-100: #f1f5f9;
-  --secondary-500: #64748b;
-  --secondary-600: #475569;
-  --secondary-700: #334155;
+  --secondary-50: #fef7ff;
+  --secondary-100: #fce7ff;
+  --secondary-500: #a855f7;
+  --secondary-600: #9333ea;
+  --secondary-700: #7c3aed;
+  
+  /* Health-specific colors */
+  --health-blue-50: #eff6ff;
+  --health-blue-100: #dbeafe;
+  --health-blue-500: #3b82f6;
+  --health-blue-600: #2563eb;
+  
+  --health-teal-50: #f0fdfa;
+  --health-teal-100: #ccfbf1;
+  --health-teal-500: #14b8a6;
+  --health-teal-600: #0d9488;
   
   --success-50: #f0fdf4;
   --success-500: #22c55e;

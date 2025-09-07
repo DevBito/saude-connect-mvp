@@ -30,17 +30,17 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-light flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-health-teal-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center animate-fade-in">
-          <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-medium">
-            <span className="text-white font-bold text-3xl">S</span>
+          <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-health-teal-500 rounded-3xl flex items-center justify-center shadow-medium">
+            <span className="text-white font-bold text-4xl">S</span>
           </div>
         </div>
-        <h2 className="mt-8 text-center text-4xl font-bold text-gray-900 animate-slide-up">
+        <h2 className="mt-8 text-center text-5xl font-bold text-gray-900 animate-slide-up">
           Entre na sua conta
         </h2>
-        <p className="mt-4 text-center text-lg text-gray-600 animate-slide-up" style={{animationDelay: '0.1s'}}>
+        <p className="mt-6 text-center text-xl text-gray-700 animate-slide-up" style={{animationDelay: '0.1s'}}>
           Ou{' '}
           <Link
             to="/register"
@@ -51,9 +51,9 @@ export default function Login() {
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-10 px-6 shadow-medium rounded-2xl border border-gray-100 animate-slide-up" style={{animationDelay: '0.2s'}}>
-          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg">
+        <div className="bg-white/90 backdrop-blur-sm py-12 px-8 shadow-medium rounded-3xl border border-gray-100 animate-slide-up" style={{animationDelay: '0.2s'}}>
+          <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
             {error && (
               <div className="bg-error-50 border border-error-200 text-error-700 px-4 py-3 rounded-md">
                 {error}
@@ -77,7 +77,7 @@ export default function Login() {
                     }
                   })}
                   type="email"
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl shadow-soft placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="block w-full pl-12 pr-4 py-4 text-lg border border-gray-300 rounded-2xl shadow-soft placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   placeholder="seu@email.com"
                 />
               </div>
@@ -99,7 +99,7 @@ export default function Login() {
                     required: 'Senha é obrigatória'
                   })}
                   type={showPassword ? 'text' : 'password'}
-                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl shadow-soft placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="block w-full pl-12 pr-12 py-4 text-lg border border-gray-300 rounded-2xl shadow-soft placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   placeholder="Sua senha"
                 />
                 <button
@@ -143,11 +143,11 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-medium text-base font-medium text-white bg-gradient-primary hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all btn-modern"
+                className="w-full flex justify-center py-4 px-6 border border-transparent rounded-2xl shadow-medium text-xl font-medium text-white bg-gradient-to-r from-primary-500 to-health-teal-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all btn-modern"
               >
                 {isLoading ? (
                   <div className="flex items-center">
-                    <div className="spinner mr-2"></div>
+                    <div className="spinner mr-3"></div>
                     Entrando...
                   </div>
                 ) : (
