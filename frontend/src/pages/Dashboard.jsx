@@ -28,10 +28,12 @@ export default function Dashboard() {
     'userAppointments',
     appointmentService.getUserAppointments,
     {
-      onSuccess: (data) => {
+      onSuccess: (response) => {
+        console.log('📅 Resposta dos appointments:', response)
+        const data = response.data || []
         const upcoming = data
-          .filter(apt => new Date(apt.appointment_date) > new Date())
-          .sort((a, b) => new Date(a.appointment_date) - new Date(b.appointment_date))
+          .filter(apt => new Date(apt.date) > new Date())
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
           .slice(0, 3)
         setUpcomingAppointments(upcoming)
       }

@@ -274,6 +274,32 @@ app.get('/api/appointments-mock', authenticateToken, (req, res) => {
   });
 });
 
+// Endpoint de teste para profissionais
+app.get('/api/test-professionals', async (req, res) => {
+  try {
+    console.log('🧪 Teste de profissionais - query:', req.query);
+    
+    const result = await pool.query(
+      'SELECT id, name, specialty, crm, phone, created_at FROM professionals ORDER BY name LIMIT 5'
+    );
+
+    res.json({
+      success: true,
+      message: 'Teste de profissionais funcionando',
+      data: result.rows,
+      count: result.rows.length
+    });
+
+  } catch (error) {
+    console.error('❌ Erro no teste de profissionais:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro no teste',
+      error: error.message
+    });
+  }
+});
+
 // Endpoint para inserir dados de teste
 app.post('/api/seed-professionals', async (req, res) => {
   try {
@@ -1261,12 +1287,12 @@ app.get('/api/professionals', async (req, res) => {
       params.push(`%${req.query.search}%`);
     }
 
-    // Filtro por localização (se implementado)
-    if (req.query.location) {
-      paramCount++;
-      query += ` AND (city ILIKE $${paramCount} OR state ILIKE $${paramCount})`;
-      params.push(`%${req.query.location}%`);
-    }
+    // Filtro por localização (removido - campos não existem na tabela)
+    // if (req.query.location) {
+    //   paramCount++;
+    //   query += ` AND (city ILIKE $${paramCount} OR state ILIKE $${paramCount})`;
+    //   params.push(`%${req.query.location}%`);
+    // }
 
     query += ' ORDER BY name';
 
