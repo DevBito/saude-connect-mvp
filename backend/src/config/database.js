@@ -4,7 +4,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const pool = new Pool({
-  connectionString: process.env.SAUDE_POSTGRES_URL,
+  connectionString: process.env.SAUDE_POSTGRES_URL_NON_POOLING || process.env.SAUDE_POSTGRES_URL,
   ssl: false,
   max: 20,
   idleTimeoutMillis: 30000,

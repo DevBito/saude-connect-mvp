@@ -17,13 +17,19 @@ const app = express();
 
 // Database connection
 const getDatabaseUrl = () => {
-  // Usar SAUDE_POSTGRES_URL como principal
+  // Tentar URL sem pooling primeiro (menos problemas de SSL)
+  if (process.env.SAUDE_POSTGRES_URL_NON_POOLING) {
+    console.log('✅ Usando SAUDE_POSTGRES_URL_NON_POOLING');
+    return process.env.SAUDE_POSTGRES_URL_NON_POOLING;
+  }
+  
+  // Usar SAUDE_POSTGRES_URL como fallback
   if (process.env.SAUDE_POSTGRES_URL) {
     console.log('✅ Usando SAUDE_POSTGRES_URL');
     return process.env.SAUDE_POSTGRES_URL;
   }
   
-  // Construir URL a partir das variáveis individuais como fallback
+  // Construir URL a partir das variáveis individuais como último recurso
   const user = process.env.SAUDE_POSTGRES_USER;
   const password = process.env.SAUDE_POSTGRES_PASSWORD;
   const host = process.env.SAUDE_POSTGRES_HOST;
@@ -298,6 +304,60 @@ app.get('/api/db-test', async (req, res) => {
       }
     });
   }
+});
+
+// Teste de diferentes URLs de conexão
+app.get('/api/url-test', async (req, res) => {
+  const { Pool } = require('pg');
+  const results = [];
+  
+  const urls = [
+    { name: 'SAUDE_POSTGRES_URL_NON_POOLING', url: process.env.SAUDE_POSTGRES_URL_NON_POOLING },
+    { name: 'SAUDE_POSTGRES_URL', url: process.env.SAUDE_POSTGRES_URL },
+    { name: 'SAUDE_POSTGRES_PRISMA_URL', url: process.env.SAUDE_POSTGRES_PRISMA_URL }
+  ];
+  
+  for (const urlConfig of urls) {
+    if (!urlConfig.url) {
+      results.push({
+        test: urlConfig.name,
+        success: false,
+        error: 'URL não configurada'
+      });
+      continue;
+    }
+    
+    try {
+      console.log(`Testando ${urlConfig.name}...`);
+      const testPool = new Pool({
+        connectionString: urlConfig.url,
+        ssl: false
+      });
+      
+      const result = await testPool.query('SELECT NOW() as current_time');
+      await testPool.end();
+      
+      results.push({
+        test: urlConfig.name,
+        success: true,
+        currentTime: result.rows[0].current_time
+      });
+    } catch (error) {
+      results.push({
+        test: urlConfig.name,
+        success: false,
+        error: error.message
+      });
+    }
+  }
+  
+  res.json({
+    message: 'Testes de diferentes URLs',
+    results: results,
+    recommendation: results.find(r => r.success) ? 
+      `Use: ${results.find(r => r.success).test}` : 
+      'Nenhuma URL funcionou'
+  });
 });
 
 // Teste de conexão SSL específico
