@@ -24,7 +24,7 @@ export default function Dashboard() {
   const [upcomingAppointments, setUpcomingAppointments] = useState([])
 
   // Buscar agendamentos do usuário
-  const { data: appointments, isLoading } = useQuery(
+  const { data: appointmentsResponse, isLoading } = useQuery(
     'userAppointments',
     appointmentService.getUserAppointments,
     {
@@ -39,6 +39,9 @@ export default function Dashboard() {
       }
     }
   )
+
+  // Extrair os dados dos appointments da resposta
+  const appointments = appointmentsResponse?.data || []
 
   const formatAppointmentDate = (dateString) => {
     const date = parseISO(dateString)
