@@ -41,7 +41,12 @@ export default function Dashboard() {
   )
 
   // Extrair os dados dos appointments da resposta
-  const appointments = appointmentsResponse?.data || []
+  const appointments = Array.isArray(appointmentsResponse?.data) ? appointmentsResponse.data : []
+  
+  // Debug logs
+  console.log('🔍 appointmentsResponse:', appointmentsResponse)
+  console.log('🔍 appointments (array):', appointments)
+  console.log('🔍 appointments é array?', Array.isArray(appointments))
 
   const formatAppointmentDate = (dateString) => {
     const date = parseISO(dateString)
@@ -83,14 +88,14 @@ export default function Dashboard() {
   const stats = [
     {
       title: 'Consultas Agendadas',
-      value: appointments?.filter(apt => apt.status === 'scheduled').length || 0,
+      value: Array.isArray(appointments) ? appointments.filter(apt => apt.status === 'scheduled').length : 0,
       icon: Calendar,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100'
     },
     {
       title: 'Consultas Realizadas',
-      value: appointments?.filter(apt => apt.status === 'completed').length || 0,
+      value: Array.isArray(appointments) ? appointments.filter(apt => apt.status === 'completed').length : 0,
       icon: TrendingUp,
       color: 'text-green-600',
       bgColor: 'bg-green-100'
