@@ -109,7 +109,7 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ success: false, message: 'Token de acesso requerido' });
   }
 
-  jwt.verify(token, process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key', (err, user) => {
+  jwt.verify(token, process.env.SAUDE_SUPABASE_JWT_SECRET || process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key', (err, user) => {
     if (err) {
       return res.status(403).json({ success: false, message: 'Token inválido' });
     }
@@ -190,7 +190,7 @@ app.get('/api/vars', (req, res) => {
       SAUDE_POSTGRES_PASSWORD: process.env.SAUDE_POSTGRES_PASSWORD ? 'Configurado' : 'Não configurado',
       SAUDE_POSTGRES_HOST: process.env.SAUDE_POSTGRES_HOST ? 'Configurado' : 'Não configurado',
       SAUDE_POSTGRES_DATABASE: process.env.SAUDE_POSTGRES_DATABASE ? 'Configurado' : 'Não configurado',
-      SAUDE_JWT_SECRET: process.env.SAUDE_JWT_SECRET ? 'Configurado' : 'Não configurado',
+      SAUDE_JWT_SECRET: process.env.SAUDE_SUPABASE_JWT_SECRET ? 'Configurado' : 'Não configurado',
       DATABASE_URL: process.env.DATABASE_URL ? 'Configurado' : 'Não configurado',
       JWT_SECRET: process.env.JWT_SECRET ? 'Configurado' : 'Não configurado'
     },
@@ -250,7 +250,7 @@ app.post('/api/auth/register', async (req, res) => {
     // Gerar JWT token
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
+      process.env.SAUDE_SUPABASE_JWT_SECRET || process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
       { expiresIn: '24h' }
     );
 
@@ -326,7 +326,7 @@ app.post('/api/auth/login', async (req, res) => {
     // Gerar JWT token
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
+      process.env.SAUDE_SUPABASE_JWT_SECRET || process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
       { expiresIn: '24h' }
     );
 
@@ -456,7 +456,7 @@ app.post('/api/professionals/register', async (req, res) => {
     // Gerar JWT token
     const token = jwt.sign(
       { professionalId: professional.id, email: professional.email },
-      process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
+      process.env.SAUDE_SUPABASE_JWT_SECRET || process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
       { expiresIn: '24h' }
     );
 
@@ -525,7 +525,7 @@ app.post('/api/professionals/login', async (req, res) => {
     // Gerar JWT token
     const token = jwt.sign(
       { professionalId: professional.id, email: professional.email },
-      process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
+      process.env.SAUDE_SUPABASE_JWT_SECRET || process.env.SAUDE_JWT_SECRET || process.env.JWT_SECRET || 'fallback-secret-key',
       { expiresIn: '24h' }
     );
 
