@@ -48,17 +48,37 @@ app.get('/api/test', (req, res) => {
 });
 
 // Auth routes placeholder
+app.get('/api/auth/register', (req, res) => {
+  res.json({
+    message: 'Endpoint de registro funcionando! (GET)',
+    timestamp: new Date().toISOString(),
+    method: 'GET'
+  });
+});
+
 app.post('/api/auth/register', (req, res) => {
   res.json({
-    message: 'Endpoint de registro funcionando!',
-    timestamp: new Date().toISOString()
+    message: 'Endpoint de registro funcionando! (POST)',
+    timestamp: new Date().toISOString(),
+    method: 'POST',
+    body: req.body
+  });
+});
+
+app.get('/api/auth/login', (req, res) => {
+  res.json({
+    message: 'Endpoint de login funcionando! (GET)',
+    timestamp: new Date().toISOString(),
+    method: 'GET'
   });
 });
 
 app.post('/api/auth/login', (req, res) => {
   res.json({
-    message: 'Endpoint de login funcionando!',
-    timestamp: new Date().toISOString()
+    message: 'Endpoint de login funcionando! (POST)',
+    timestamp: new Date().toISOString(),
+    method: 'POST',
+    body: req.body
   });
 });
 
