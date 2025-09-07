@@ -17,36 +17,18 @@ const app = express();
 
 // Database connection
 const getDatabaseUrl = () => {
-  let databaseUrl = null;
-  
-  // Tentar URL sem pooling primeiro (menos problemas de SSL)
-  if (process.env.SAUDE_POSTGRES_URL_NON_POOLING) {
-    console.log('✅ Usando SAUDE_POSTGRES_URL_NON_POOLING');
-    databaseUrl = process.env.SAUDE_POSTGRES_URL_NON_POOLING;
-  } else if (process.env.SAUDE_POSTGRES_URL) {
-    console.log('✅ Usando SAUDE_POSTGRES_URL');
-    databaseUrl = process.env.SAUDE_POSTGRES_URL;
-  } else {
-    // Construir URL a partir das variáveis individuais como último recurso
-    const user = process.env.SAUDE_POSTGRES_USER;
-    const password = process.env.SAUDE_POSTGRES_PASSWORD;
-    const host = process.env.SAUDE_POSTGRES_HOST;
-    const database = process.env.SAUDE_POSTGRES_DATABASE;
-    
-    if (user && password && host && database) {
-      databaseUrl = `postgresql://${user}:${password}@${host}:5432/${database}`;
-      console.log('✅ Construindo URL a partir de variáveis individuais');
-    }
-  }
-  
-  if (!databaseUrl) {
-    console.log('❌ Nenhuma variável de banco encontrada');
+  // USAR APENAS SAUDE_POSTGRES_URL_NON_POOLING (FUNCIONOU!)
+  if (!process.env.SAUDE_POSTGRES_URL_NON_POOLING) {
+    console.log('❌ SAUDE_POSTGRES_URL_NON_POOLING não configurada');
     return null;
   }
   
+  let databaseUrl = process.env.SAUDE_POSTGRES_URL_NON_POOLING;
+  console.log('✅ Usando SAUDE_POSTGRES_URL_NON_POOLING (FUNCIONOU!)');
+  console.log('URL original:', databaseUrl);
+  
   // FORÇAR SSL DESABILITADO NA URL
   console.log('🔧 FORÇANDO SSL DESABILITADO NA URL...');
-  console.log('URL original:', databaseUrl);
   
   // Remover TODOS os parâmetros SSL existentes
   databaseUrl = databaseUrl.replace(/[?&]sslmode=[^&]*/g, '');

@@ -5,12 +5,14 @@ dotenv.config()
 
 // Função para forçar SSL desabilitado na URL
 const getDatabaseUrl = () => {
-  let databaseUrl = process.env.SAUDE_POSTGRES_URL_NON_POOLING || process.env.SAUDE_POSTGRES_URL;
-  
-  if (!databaseUrl) {
-    console.log('❌ Nenhuma URL de banco encontrada');
+  // USAR APENAS SAUDE_POSTGRES_URL_NON_POOLING (FUNCIONOU!)
+  if (!process.env.SAUDE_POSTGRES_URL_NON_POOLING) {
+    console.log('❌ SAUDE_POSTGRES_URL_NON_POOLING não configurada');
     return null;
   }
+  
+  let databaseUrl = process.env.SAUDE_POSTGRES_URL_NON_POOLING;
+  console.log('✅ Usando SAUDE_POSTGRES_URL_NON_POOLING (FUNCIONOU!)');
   
   // FORÇAR SSL DESABILITADO NA URL
   console.log('🔧 FORÇANDO SSL DESABILITADO NA URL...');
