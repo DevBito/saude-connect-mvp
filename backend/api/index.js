@@ -180,6 +180,24 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// Teste simples de variáveis
+app.get('/api/vars', (req, res) => {
+  res.json({
+    message: 'Variáveis de ambiente',
+    vars: {
+      NODE_ENV: process.env.NODE_ENV,
+      SAUDE_POSTGRES_USER: process.env.SAUDE_POSTGRES_USER ? 'Configurado' : 'Não configurado',
+      SAUDE_POSTGRES_PASSWORD: process.env.SAUDE_POSTGRES_PASSWORD ? 'Configurado' : 'Não configurado',
+      SAUDE_POSTGRES_HOST: process.env.SAUDE_POSTGRES_HOST ? 'Configurado' : 'Não configurado',
+      SAUDE_POSTGRES_DATABASE: process.env.SAUDE_POSTGRES_DATABASE ? 'Configurado' : 'Não configurado',
+      SAUDE_JWT_SECRET: process.env.SAUDE_JWT_SECRET ? 'Configurado' : 'Não configurado',
+      DATABASE_URL: process.env.DATABASE_URL ? 'Configurado' : 'Não configurado',
+      JWT_SECRET: process.env.JWT_SECRET ? 'Configurado' : 'Não configurado'
+    },
+    databaseUrl: getDatabaseUrl() ? 'URL construída com sucesso' : 'Falha ao construir URL'
+  });
+});
+
 // ===== AUTH ROUTES =====
 
 app.get('/api/auth/register', (req, res) => {
