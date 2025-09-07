@@ -95,15 +95,26 @@ export function AuthProvider({ children }) {
     
     try {
       const response = await authService.login(email, password)
-      localStorage.setItem('token', response.token)
+      console.log('🔑 Resposta do login:', response)
+      
+      // A resposta tem a estrutura: { success: true, data: { user: {...}, token: "..." } }
+      const { user, token } = response.data
+      
+      if (token) {
+        localStorage.setItem('token', token)
+        console.log('✅ Token salvo no localStorage:', token.substring(0, 20) + '...')
+      } else {
+        console.error('❌ Token não encontrado na resposta')
+      }
       
       dispatch({
         type: 'AUTH_SUCCESS',
-        payload: response
+        payload: { user, token }
       })
       
       return { success: true }
     } catch (error) {
+      console.error('❌ Erro no login:', error)
       const errorMessage = error.response?.data?.message || 'Erro ao fazer login'
       dispatch({
         type: 'AUTH_FAILURE',
@@ -119,15 +130,26 @@ export function AuthProvider({ children }) {
     
     try {
       const response = await authService.register(userData)
-      localStorage.setItem('token', response.token)
+      console.log('🔑 Resposta do registro:', response)
+      
+      // A resposta tem a estrutura: { success: true, data: { user: {...}, token: "..." } }
+      const { user, token } = response.data
+      
+      if (token) {
+        localStorage.setItem('token', token)
+        console.log('✅ Token salvo no localStorage:', token.substring(0, 20) + '...')
+      } else {
+        console.error('❌ Token não encontrado na resposta')
+      }
       
       dispatch({
         type: 'AUTH_SUCCESS',
-        payload: response
+        payload: { user, token }
       })
       
       return { success: true }
     } catch (error) {
+      console.error('❌ Erro no registro:', error)
       const errorMessage = error.response?.data?.message || 'Erro ao criar conta'
       dispatch({
         type: 'AUTH_FAILURE',
