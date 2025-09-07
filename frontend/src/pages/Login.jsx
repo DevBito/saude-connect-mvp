@@ -30,30 +30,30 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-health-teal-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center animate-fade-in">
-          <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-health-teal-500 rounded-3xl flex items-center justify-center shadow-medium">
-            <span className="text-white font-bold text-4xl">S</span>
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center py-12">
+      <div className="w-full max-w-2xl mx-auto px-6">
+        <div className="text-center mb-12">
+          <div className="flex justify-center animate-fade-in mb-8">
+            <div className="w-24 h-24 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-3xl flex items-center justify-center shadow-medium">
+              <span className="text-white font-bold text-5xl">S</span>
+            </div>
           </div>
+          <h2 className="text-6xl font-bold text-gray-900 animate-slide-up mb-6">
+            Entre na sua conta
+          </h2>
+          <p className="text-2xl text-gray-700 animate-slide-up" style={{animationDelay: '0.1s'}}>
+            Ou{' '}
+            <Link
+              to="/register"
+              className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
+            >
+              crie uma nova conta
+            </Link>
+          </p>
         </div>
-        <h2 className="mt-8 text-center text-5xl font-bold text-gray-900 animate-slide-up">
-          Entre na sua conta
-        </h2>
-        <p className="mt-6 text-center text-xl text-gray-700 animate-slide-up" style={{animationDelay: '0.1s'}}>
-          Ou{' '}
-          <Link
-            to="/register"
-            className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
-          >
-            crie uma nova conta
-          </Link>
-        </p>
-      </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg">
-        <div className="bg-white/90 backdrop-blur-sm py-12 px-8 shadow-medium rounded-3xl border border-gray-100 animate-slide-up" style={{animationDelay: '0.2s'}}>
-          <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
+        <div className="bg-white/95 backdrop-blur-sm py-16 px-12 shadow-medium rounded-3xl border border-gray-100 animate-slide-up" style={{animationDelay: '0.2s'}}>
+          <form className="space-y-10" onSubmit={handleSubmit(onSubmit)}>
             {error && (
               <div className="bg-error-50 border border-error-200 text-error-700 px-4 py-3 rounded-md">
                 {error}
@@ -143,7 +143,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-4 px-6 border border-transparent rounded-2xl shadow-medium text-xl font-medium text-white bg-gradient-to-r from-primary-500 to-health-teal-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all btn-modern"
+                className="w-full flex justify-center py-5 px-8 border border-transparent rounded-2xl shadow-medium text-xl font-medium text-white bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all btn-modern"
               >
                 {isLoading ? (
                   <div className="flex items-center">

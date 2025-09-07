@@ -32,32 +32,32 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">S</span>
+        <div className="container mx-auto">
+          <div className="flex items-center justify-between h-20">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-medium">
+                <span className="text-white font-bold text-2xl">S</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">Saúde Connect</span>
+              <span className="text-2xl font-bold text-gray-900">Saúde Connect</span>
             </div>
             
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-gray-900">Recursos</a>
-              <a href="#about" className="text-gray-600 hover:text-gray-900">Sobre</a>
-              <a href="#contact" className="text-gray-600 hover:text-gray-900">Contato</a>
+            <nav className="hidden md:flex items-center space-x-10">
+              <a href="#features" className="text-gray-600 hover:text-primary-600 transition-colors text-lg">Recursos</a>
+              <a href="#about" className="text-gray-600 hover:text-primary-600 transition-colors text-lg">Sobre</a>
+              <a href="#contact" className="text-gray-600 hover:text-primary-600 transition-colors text-lg">Contato</a>
             </nav>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               {isAuthenticated ? (
-                <Link to="/dashboard" className="btn btn-primary">
+                <Link to="/dashboard" className="btn btn-primary btn-lg">
                   Dashboard
                 </Link>
               ) : (
                 <>
-                  <Link to="/login" className="text-gray-600 hover:text-gray-900">
+                  <Link to="/login" className="text-gray-600 hover:text-primary-600 transition-colors text-lg font-medium">
                     Entrar
                   </Link>
-                  <Link to="/register" className="btn btn-primary">
+                  <Link to="/register" className="btn btn-primary btn-lg">
                     Criar Conta
                   </Link>
                 </>
@@ -68,30 +68,30 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-50 via-white to-health-teal-50 py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-50/30 to-health-blue-50/20"></div>
+      <section className="relative bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-40 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-50/30 to-secondary-50/20"></div>
         <div className="container mx-auto text-center relative z-10">
           <div className="animate-fade-in">
-            <h1 className="text-6xl md:text-8xl font-bold text-gray-900 mb-8 leading-tight">
+            <h1 className="text-6xl md:text-8xl font-bold text-gray-900 mb-10 leading-tight">
               Sua saúde em suas mãos
             </h1>
-            <p className="text-2xl md:text-3xl text-gray-700 mb-12 max-w-5xl mx-auto leading-relaxed">
+            <p className="text-2xl md:text-3xl text-gray-700 mb-16 max-w-5xl mx-auto leading-relaxed">
               Conecte-se com profissionais de saúde qualificados, agende consultas 
               online e presenciais, e gerencie seu histórico médico de forma segura e prática.
             </p>
-            <div className="flex flex-col sm:flex-row gap-8 justify-center">
+            <div className="flex flex-col sm:flex-row gap-12 justify-center">
               {!isAuthenticated && (
                 <>
-                  <Link to="/register" className="btn btn-primary btn-lg btn-modern shadow-medium text-lg px-12 py-4">
+                  <Link to="/register" className="btn btn-primary btn-lg btn-modern shadow-medium text-lg px-16 py-5">
                     Começar Agora
                   </Link>
-                  <Link to="/login" className="btn btn-secondary btn-lg shadow-soft text-lg px-12 py-4">
+                  <Link to="/login" className="btn btn-secondary btn-lg shadow-soft text-lg px-16 py-5">
                     Já tenho conta
                   </Link>
                 </>
               )}
               {isAuthenticated && (
-                <Link to="/professionals" className="btn btn-primary btn-lg btn-modern shadow-medium text-lg px-12 py-4">
+                <Link to="/professionals" className="btn btn-primary btn-lg btn-modern shadow-medium text-lg px-16 py-5">
                   Buscar Profissionais
                 </Link>
               )}
@@ -101,10 +101,10 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-32 bg-gradient-to-br from-white to-primary-50">
+      <section id="features" className="py-40 bg-gradient-to-br from-white to-primary-50">
         <div className="container mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+          <div className="text-center mb-24">
+            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-8">
               Por que escolher o Saúde Connect?
             </h2>
             <p className="text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
@@ -112,21 +112,21 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             {features.map((feature, index) => {
               const Icon = feature.icon
               const colors = [
                 'bg-gradient-to-br from-primary-500 to-primary-600',
+                'bg-gradient-to-br from-secondary-500 to-secondary-600',
                 'bg-gradient-to-br from-health-blue-500 to-health-blue-600',
-                'bg-gradient-to-br from-health-teal-500 to-health-teal-600',
-                'bg-gradient-to-br from-secondary-500 to-secondary-600'
+                'bg-gradient-to-br from-health-teal-500 to-health-teal-600'
               ]
               return (
-                <div key={index} className="card card-hover p-10 text-center animate-slide-up bg-white/80 backdrop-blur-sm" style={{animationDelay: `${index * 0.1}s`}}>
-                  <div className={`w-24 h-24 ${colors[index]} rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-medium`}>
-                    <Icon className="w-12 h-12 text-white" />
+                <div key={index} className="card card-hover p-12 text-center animate-slide-up bg-white/90 backdrop-blur-sm" style={{animationDelay: `${index * 0.1}s`}}>
+                  <div className={`w-28 h-28 ${colors[index]} rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-medium`}>
+                    <Icon className="w-14 h-14 text-white" />
                   </div>
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-6">
+                  <h3 className="text-2xl font-semibold text-gray-900 mb-8">
                     {feature.title}
                   </h3>
                   <p className="text-lg text-gray-700 leading-relaxed">
@@ -140,19 +140,19 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-32 bg-gradient-to-br from-primary-50 via-white to-health-teal-50">
+      <section className="py-40 bg-gradient-to-br from-primary-50 via-white to-secondary-50">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-20 text-center">
             <div className="animate-fade-in">
-              <div className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent mb-6">1000+</div>
+              <div className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent mb-8">1000+</div>
               <div className="text-2xl text-gray-700 font-medium">Profissionais Cadastrados</div>
             </div>
             <div className="animate-fade-in" style={{animationDelay: '0.2s'}}>
-              <div className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-health-blue-500 to-health-blue-600 bg-clip-text text-transparent mb-6">5000+</div>
+              <div className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-secondary-500 to-secondary-600 bg-clip-text text-transparent mb-8">5000+</div>
               <div className="text-2xl text-gray-700 font-medium">Consultas Realizadas</div>
             </div>
             <div className="animate-fade-in" style={{animationDelay: '0.4s'}}>
-              <div className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-health-teal-500 to-health-teal-600 bg-clip-text text-transparent mb-6">98%</div>
+              <div className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-health-blue-500 to-health-blue-600 bg-clip-text text-transparent mb-8">98%</div>
               <div className="text-2xl text-gray-700 font-medium">Satisfação dos Usuários</div>
             </div>
           </div>
@@ -160,18 +160,18 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 bg-gradient-to-br from-primary-600 via-primary-700 to-health-teal-600 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 to-health-teal-600/90"></div>
+      <section className="py-40 bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 to-secondary-600/90"></div>
         <div className="container mx-auto text-center relative z-10">
           <div className="animate-fade-in">
-            <h2 className="text-5xl md:text-7xl font-bold text-white mb-8">
+            <h2 className="text-5xl md:text-7xl font-bold text-white mb-10">
               Pronto para cuidar da sua saúde?
             </h2>
-            <p className="text-2xl text-white/95 mb-12 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-2xl text-white/95 mb-16 max-w-4xl mx-auto leading-relaxed">
               Junte-se a milhares de pessoas que já confiam no Saúde Connect para gerenciar sua saúde de forma segura e eficiente
             </p>
             {!isAuthenticated && (
-              <Link to="/register" className="btn btn-lg bg-white text-primary-600 hover:bg-gray-100 shadow-medium btn-modern text-xl px-16 py-5">
+              <Link to="/register" className="btn btn-lg bg-white text-primary-600 hover:bg-gray-100 shadow-medium btn-modern text-xl px-20 py-6">
                 Criar Conta Gratuita
               </Link>
             )}
@@ -180,17 +180,17 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-br from-gray-800 via-gray-900 to-primary-900 text-white py-20">
+      <footer className="bg-gradient-to-br from-primary-800 via-primary-900 to-primary-950 text-white py-24">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-20">
             <div className="md:col-span-1">
-              <div className="flex items-center space-x-4 mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-health-teal-500 rounded-2xl flex items-center justify-center shadow-medium">
-                  <span className="text-white font-bold text-2xl">S</span>
+              <div className="flex items-center space-x-4 mb-10">
+                <div className="w-16 h-16 bg-gradient-to-br from-white to-blue-100 rounded-3xl flex items-center justify-center shadow-medium">
+                  <span className="text-primary-600 font-bold text-3xl">S</span>
                 </div>
-                <span className="text-3xl font-bold">Saúde Connect</span>
+                <span className="text-4xl font-bold">Saúde Connect</span>
               </div>
-              <p className="text-gray-300 leading-relaxed text-lg">
+              <p className="text-blue-100 leading-relaxed text-xl">
                 Conectando pessoas a profissionais de saúde qualificados de forma segura e prática.
               </p>
             </div>

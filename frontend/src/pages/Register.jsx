@@ -33,30 +33,30 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <div className="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-2xl">S</span>
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center py-12">
+      <div className="w-full max-w-2xl mx-auto px-6">
+        <div className="text-center mb-12">
+          <div className="flex justify-center animate-fade-in mb-8">
+            <div className="w-24 h-24 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-3xl flex items-center justify-center shadow-medium">
+              <span className="text-white font-bold text-5xl">S</span>
+            </div>
           </div>
+          <h2 className="text-6xl font-bold text-gray-900 animate-slide-up mb-6">
+            Crie sua conta
+          </h2>
+          <p className="text-2xl text-gray-700 animate-slide-up" style={{animationDelay: '0.1s'}}>
+            Ou{' '}
+            <Link
+              to="/login"
+              className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
+            >
+              entre na sua conta existente
+            </Link>
+          </p>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-          Crie sua conta
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Ou{' '}
-          <Link
-            to="/login"
-            className="font-medium text-primary-600 hover:text-primary-500"
-          >
-            entre na sua conta existente
-          </Link>
-        </p>
-      </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <div className="bg-white/95 backdrop-blur-sm py-16 px-12 shadow-medium rounded-3xl border border-gray-100 animate-slide-up" style={{animationDelay: '0.2s'}}>
+          <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
             {error && (
               <div className="bg-error-50 border border-error-200 text-error-700 px-4 py-3 rounded-md">
                 {error}
@@ -80,7 +80,7 @@ export default function Register() {
                     }
                   })}
                   type="text"
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                  className="block w-full pl-12 pr-4 py-4 text-lg border border-gray-300 rounded-2xl shadow-soft placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   placeholder="Seu nome completo"
                 />
               </div>
@@ -255,11 +255,11 @@ export default function Register() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-5 px-8 border border-transparent rounded-2xl shadow-medium text-xl font-medium text-white bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all btn-modern"
               >
                 {isLoading ? (
                   <div className="flex items-center">
-                    <div className="spinner mr-2"></div>
+                    <div className="spinner mr-3"></div>
                     Criando conta...
                   </div>
                 ) : (

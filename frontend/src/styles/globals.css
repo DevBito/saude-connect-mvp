@@ -220,7 +220,7 @@ input::placeholder, textarea::placeholder {
 /* Grid System */
 .grid {
   display: grid;
-  gap: var(--spacing-6);
+  gap: var(--spacing-8);
 }
 
 .grid-cols-1 {
@@ -241,7 +241,7 @@ input::placeholder, textarea::placeholder {
 
 @media (min-width: 768px) {
   .grid {
-    gap: var(--spacing-8);
+    gap: var(--spacing-12);
   }
   
   .md\:grid-cols-2 {
@@ -259,7 +259,7 @@ input::placeholder, textarea::placeholder {
 
 @media (min-width: 1024px) {
   .grid {
-    gap: var(--spacing-10);
+    gap: var(--spacing-16);
   }
   
   .lg\:grid-cols-3 {
