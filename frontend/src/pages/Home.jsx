@@ -169,10 +169,10 @@ const Home = () => {
         </div>
 
         <div className="container foot-bottom">
-          <p>© 2024 Saúde Connect. Todos os direitos reservados.</p>
+          <p>© 2025 Saúde Connect. Todos os direitos reservados.</p>
           <div style={{display: 'flex', gap: '14px'}}>
-            <a className="foot-link" href="#" aria-label="LinkedIn">LinkedIn</a>
-            <a className="foot-link" href="#" aria-label="Twitter">Twitter</a>
+            <a className="foot-link" href="https://www.linkedin.com/in/gabriel-a837921a3/" aria-label="LinkedIn">LinkedIn</a>
+            <a className="foot-link" href="https://x.com/?lang=pt" aria-label="Twitter">Twitter</a>
           </div>
         </div>
       </footer>

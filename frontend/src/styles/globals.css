@@ -114,7 +114,7 @@ header {
 
 .btn-primary {
   background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));
-  color: #fff;
+  color: #fff !important;
   box-shadow: var(--shadow-2);
 }
 
@@ -130,6 +130,13 @@ header {
 
 .btn-outline:hover {
   border-color: color-mix(in srgb, var(--primary-600) 40%, var(--line));
+}
+
+/* Hide nav on mobile */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none !important;
+  }
 }
 
 /* Hero */

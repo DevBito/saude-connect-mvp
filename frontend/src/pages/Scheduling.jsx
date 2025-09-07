@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
-import { Calendar, Clock, MapPin, User } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import { Calendar, Clock, MapPin, User, LogOut, ArrowLeft } from 'lucide-react'
 
 export default function Scheduling() {
+  const { user, logout } = useAuth()
   const { professionalId } = useParams()
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
@@ -14,95 +17,375 @@ export default function Scheduling() {
   ]
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Agendar Consulta</h1>
-        <p className="text-gray-600">Selecione a data e horário para sua consulta</p>
-      </div>
+    <div style={{
+      minHeight: '100vh',
+      font: '400 1rem/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"',
+      color: 'var(--text)',
+      background: `
+        radial-gradient(800px 400px at 20% -10%, color-mix(in srgb, var(--secondary-500) 14%, transparent), transparent 70%),
+        radial-gradient(900px 500px at 80% -20%, color-mix(in srgb, var(--primary-500) 16%, transparent), transparent 70%),
+        linear-gradient(180deg, #fff, var(--surface-2))
+      `,
+      WebkitFontSmoothing: 'antialiased',
+      MozOsxFontSmoothing: 'grayscale',
+      padding: '28px'
+    }}>
+      {/* Header */}
+      <header style={{
+        position: 'sticky',
+        top: '0',
+        zIndex: '50',
+        backdropFilter: 'saturate(140%) blur(10px)',
+        background: 'color-mix(in srgb, var(--surface) 80%, transparent)',
+        borderBottom: '1px solid var(--line)',
+        borderRadius: '16px',
+        marginBottom: '32px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: '72px',
+          padding: '0 24px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Link 
+              to="/professionals" 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: 'var(--muted)',
+                textDecoration: 'none',
+                fontSize: '.9rem',
+                fontWeight: '600'
+              }}
+            >
+              <ArrowLeft size={16} />
+              Voltar
+            </Link>
+            <Link 
+              to="/" 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                fontWeight: '800',
+                letterSpacing: '.2px',
+                textDecoration: 'none',
+                color: 'inherit'
+              }}
+            >
+              <span style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                display: 'grid',
+                placeItems: 'center',
+                color: '#fff',
+                background: 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
+                boxShadow: 'var(--shadow-2)',
+                fontWeight: '800',
+                fontSize: '20px'
+              }}>S</span>
+              <span>Saúde Connect</span>
+            </Link>
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Professional Info */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Profissional</h2>
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center">
-              <User className="w-8 h-8 text-primary-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900">Dr. João Silva</h3>
-              <p className="text-primary-600">Cardiologia</p>
-              <p className="text-sm text-gray-600">R$ 150,00 por consulta</p>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button
+              onClick={logout}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 16px',
+                borderRadius: '10px',
+                fontWeight: '600',
+                fontSize: '.9rem',
+                border: '1px solid var(--line)',
+                cursor: 'pointer',
+                transition: '.2s border-color ease',
+                background: 'var(--surface)',
+                color: 'var(--text)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 30%, var(--line))';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.borderColor = 'var(--line)';
+              }}
+            >
+              <LogOut size={16} />
+              Sair
+            </button>
           </div>
         </div>
+      </header>
 
-        {/* Scheduling Form */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Selecionar Horário</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Data
-              </label>
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
-                className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
+      <main style={{ width: 'min(100%, var(--container))', marginInline: 'auto' }} role="main">
+        {/* Page Header */}
+        <section style={{
+          background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+          backdropFilter: 'blur(6px)',
+          border: '1px solid var(--line)',
+          borderRadius: '22px',
+          boxShadow: 'var(--shadow-1)',
+          padding: '32px',
+          marginBottom: '32px',
+          backgroundImage: 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
+          color: '#fff'
+        }}>
+          <div>
+            <h1 style={{ 
+              margin: '0 0 8px', 
+              fontSize: 'clamp(1.8rem, 1.6rem + 1vw, 2.4rem)', 
+              lineHeight: '1.2',
+              fontWeight: '800'
+            }}>
+              Agendar Consulta
+            </h1>
+            <p style={{ 
+              margin: '0', 
+              opacity: '0.9',
+              fontSize: '1.1rem'
+            }}>
+              Selecione a data e horário para sua consulta
+            </p>
+          </div>
+        </section>
 
-            {selectedDate && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Horário
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {timeSlots.map((time) => (
-                    <button
-                      key={time}
-                      onClick={() => setSelectedTime(time)}
-                      className={`py-2 px-3 text-sm border rounded-md transition-colors ${
-                        selectedTime === time
-                          ? 'bg-primary-600 text-white border-primary-600'
-                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      {time}
-                    </button>
-                  ))}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gap: '32px'
+        }}>
+          {/* Professional Info */}
+          <div>
+            <div style={{
+              background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+              backdropFilter: 'blur(6px)',
+              border: '1px solid var(--line)',
+              borderRadius: '20px',
+              boxShadow: 'var(--shadow-1)',
+              padding: '24px'
+            }}>
+              <h2 style={{
+                margin: '0 0 20px',
+                fontSize: '1.25rem',
+                fontWeight: '700',
+                color: 'var(--text)'
+              }}>
+                Profissional
+              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  background: 'var(--primary-100)',
+                  borderRadius: '50%',
+                  display: 'grid',
+                  placeItems: 'center'
+                }}>
+                  <User size={32} style={{ color: 'var(--primary-600)' }} />
+                </div>
+                <div>
+                  <h3 style={{
+                    margin: '0 0 4px',
+                    fontWeight: '700',
+                    color: 'var(--text)'
+                  }}>
+                    Dr. João Silva
+                  </h3>
+                  <p style={{
+                    margin: '0 0 4px',
+                    color: 'var(--primary-600)',
+                    fontWeight: '600'
+                  }}>
+                    Cardiologia
+                  </p>
+                  <p style={{
+                    margin: '0',
+                    fontSize: '.9rem',
+                    color: 'var(--muted)'
+                  }}>
+                    R$ 150,00 por consulta
+                  </p>
                 </div>
               </div>
-            )}
+            </div>
           </div>
 
-          {selectedDate && selectedTime && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <h3 className="font-medium text-gray-900 mb-2">Resumo da Consulta</h3>
-              <div className="space-y-2 text-sm text-gray-600">
-                <div className="flex items-center">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  {new Date(selectedDate).toLocaleDateString('pt-BR')}
-                </div>
-                <div className="flex items-center">
-                  <Clock className="w-4 h-4 mr-2" />
-                  {selectedTime}
-                </div>
-                <div className="flex items-center">
-                  <MapPin className="w-4 h-4 mr-2" />
-                  Consulta presencial
-                </div>
-              </div>
+          {/* Scheduling Form */}
+          <div>
+            <div style={{
+              background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+              backdropFilter: 'blur(6px)',
+              border: '1px solid var(--line)',
+              borderRadius: '20px',
+              boxShadow: 'var(--shadow-1)',
+              padding: '24px'
+            }}>
+              <h2 style={{
+                margin: '0 0 20px',
+                fontSize: '1.25rem',
+                fontWeight: '700',
+                color: 'var(--text)'
+              }}>
+                Selecionar Horário
+              </h2>
               
-              <button className="w-full mt-4 btn btn-primary">
-                Confirmar Agendamento
-              </button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '.9rem',
+                    fontWeight: '600',
+                    color: 'var(--text)',
+                    marginBottom: '8px'
+                  }}>
+                    Data
+                  </label>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      border: '1px solid var(--line)',
+                      borderRadius: '12px',
+                      background: 'var(--surface)',
+                      color: 'var(--text)',
+                      fontSize: '1rem',
+                      transition: '.2s border-color ease, .2s box-shadow ease'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.outline = 'none';
+                      e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 50%, var(--line))';
+                      e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--primary-600) 18%, transparent)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'var(--line)';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  />
+                </div>
+
+                {selectedDate && (
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '.9rem',
+                      fontWeight: '600',
+                      color: 'var(--text)',
+                      marginBottom: '12px'
+                    }}>
+                      Horário
+                    </label>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
+                      gap: '8px'
+                    }}>
+                      {timeSlots.map((time) => (
+                        <button
+                          key={time}
+                          onClick={() => setSelectedTime(time)}
+                          style={{
+                            padding: '10px 12px',
+                            fontSize: '.9rem',
+                            border: '1px solid var(--line)',
+                            borderRadius: '10px',
+                            cursor: 'pointer',
+                            transition: '.2s all ease',
+                            background: selectedTime === time ? 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))' : 'var(--surface)',
+                            color: selectedTime === time ? '#fff' : 'var(--text)',
+                            borderColor: selectedTime === time ? 'transparent' : 'var(--line)',
+                            boxShadow: selectedTime === time ? 'var(--shadow-2)' : 'none'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (selectedTime !== time) {
+                              e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 30%, var(--line))';
+                              e.target.style.background = 'var(--surface-2)';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (selectedTime !== time) {
+                              e.target.style.borderColor = 'var(--line)';
+                              e.target.style.background = 'var(--surface)';
+                            }
+                          }}
+                        >
+                          {time}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {selectedDate && selectedTime && (
+                <div style={{
+                  marginTop: '24px',
+                  paddingTop: '24px',
+                  borderTop: '1px solid var(--line)'
+                }}>
+                  <h3 style={{
+                    margin: '0 0 16px',
+                    fontWeight: '600',
+                    color: 'var(--text)'
+                  }}>
+                    Resumo da Consulta
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', fontSize: '.9rem', color: 'var(--muted)' }}>
+                      <Calendar size={16} style={{ marginRight: '8px' }} />
+                      {new Date(selectedDate).toLocaleDateString('pt-BR')}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', fontSize: '.9rem', color: 'var(--muted)' }}>
+                      <Clock size={16} style={{ marginRight: '8px' }} />
+                      {selectedTime}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', fontSize: '.9rem', color: 'var(--muted)' }}>
+                      <MapPin size={16} style={{ marginRight: '8px' }} />
+                      Consulta presencial
+                    </div>
+                  </div>
+                  
+                  <button style={{
+                    width: '100%',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '14px 20px',
+                    borderRadius: '12px',
+                    fontWeight: '600',
+                    fontSize: '1rem',
+                    border: '1px solid transparent',
+                    cursor: 'pointer',
+                    transition: '.2s transform ease, .25s box-shadow ease, .2s filter ease',
+                    background: 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
+                    color: '#fff',
+                    boxShadow: 'var(--shadow-2)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.filter = 'brightness(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.filter = 'none';
+                  }}
+                  >
+                    Confirmar Agendamento
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

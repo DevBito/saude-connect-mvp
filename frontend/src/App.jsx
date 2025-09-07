@@ -38,25 +38,19 @@ function App() {
         
         <Route path="/scheduling/:professionalId" element={
           <ProtectedRoute>
-            <Layout>
-              <Scheduling />
-            </Layout>
+            <Scheduling />
           </ProtectedRoute>
         } />
         
         <Route path="/history" element={
           <ProtectedRoute>
-            <Layout>
-              <History />
-            </Layout>
+            <History />
           </ProtectedRoute>
         } />
         
         <Route path="/profile" element={
           <ProtectedRoute>
-            <Layout>
-              <Profile />
-            </Layout>
+            <Profile />
           </ProtectedRoute>
         } />
         

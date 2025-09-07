@@ -1,11 +1,14 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useQuery } from 'react-query'
+import { useAuth } from '../context/AuthContext'
 import { appointmentService } from '../services/appointmentService'
-import { Calendar, Clock, User, FileText, Download } from 'lucide-react'
+import { Calendar, Clock, User, FileText, Download, LogOut, ArrowLeft } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 export default function History() {
+  const { user, logout } = useAuth()
   const [selectedAppointment, setSelectedAppointment] = useState(null)
 
   const { data: appointments, isLoading } = useQuery(
@@ -48,173 +51,543 @@ export default function History() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Histórico Médico</h1>
-        <p className="text-gray-600">Acompanhe suas consultas e resultados</p>
-      </div>
+    <div style={{
+      minHeight: '100vh',
+      font: '400 1rem/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"',
+      color: 'var(--text)',
+      background: `
+        radial-gradient(800px 400px at 20% -10%, color-mix(in srgb, var(--secondary-500) 14%, transparent), transparent 70%),
+        radial-gradient(900px 500px at 80% -20%, color-mix(in srgb, var(--primary-500) 16%, transparent), transparent 70%),
+        linear-gradient(180deg, #fff, var(--surface-2))
+      `,
+      WebkitFontSmoothing: 'antialiased',
+      MozOsxFontSmoothing: 'grayscale',
+      padding: '28px'
+    }}>
+      {/* Header */}
+      <header style={{
+        position: 'sticky',
+        top: '0',
+        zIndex: '50',
+        backdropFilter: 'saturate(140%) blur(10px)',
+        background: 'color-mix(in srgb, var(--surface) 80%, transparent)',
+        borderBottom: '1px solid var(--line)',
+        borderRadius: '16px',
+        marginBottom: '32px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: '72px',
+          padding: '0 24px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Link 
+              to="/dashboard" 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: 'var(--muted)',
+                textDecoration: 'none',
+                fontSize: '.9rem',
+                fontWeight: '600'
+              }}
+            >
+              <ArrowLeft size={16} />
+              Voltar
+            </Link>
+            <Link 
+              to="/" 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                fontWeight: '800',
+                letterSpacing: '.2px',
+                textDecoration: 'none',
+                color: 'inherit'
+              }}
+            >
+              <span style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                display: 'grid',
+                placeItems: 'center',
+                color: '#fff',
+                background: 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
+                boxShadow: 'var(--shadow-2)',
+                fontWeight: '800',
+                fontSize: '20px'
+              }}>S</span>
+              <span>Saúde Connect</span>
+            </Link>
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Appointments List */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Consultas Realizadas</h2>
-            </div>
-            
-            <div className="divide-y divide-gray-200">
-              {isLoading ? (
-                Array.from({ length: 3 }).map((_, index) => (
-                  <div key={index} className="p-6 animate-pulse">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
-                      <div className="flex-1">
-                        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : appointments?.length > 0 ? (
-                appointments.map((appointment) => (
-                  <div
-                    key={appointment.id}
-                    className="p-6 hover:bg-gray-50 cursor-pointer"
-                    onClick={() => setSelectedAppointment(appointment)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                          <User className="w-6 h-6 text-primary-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-gray-900">
-                            {appointment.professional?.name}
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            {appointment.professional?.specialty}
-                          </p>
-                          <div className="flex items-center space-x-4 mt-1">
-                            <div className="flex items-center text-sm text-gray-500">
-                              <Calendar className="w-4 h-4 mr-1" />
-                              {formatDate(appointment.appointment_date)}
-                            </div>
-                            <div className="flex items-center text-sm text-gray-500">
-                              <Clock className="w-4 h-4 mr-1" />
-                              {formatTime(appointment.appointment_date)}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(appointment.status)}`}>
-                          {getStatusText(appointment.status)}
-                        </span>
-                        <button className="text-primary-600 hover:text-primary-700">
-                          Ver detalhes
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="p-12 text-center">
-                  <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Nenhuma consulta encontrada
-                  </h3>
-                  <p className="text-gray-600">
-                    Suas consultas realizadas aparecerão aqui
-                  </p>
-                </div>
-              )}
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button
+              onClick={logout}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 16px',
+                borderRadius: '10px',
+                fontWeight: '600',
+                fontSize: '.9rem',
+                border: '1px solid var(--line)',
+                cursor: 'pointer',
+                transition: '.2s border-color ease',
+                background: 'var(--surface)',
+                color: 'var(--text)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 30%, var(--line))';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.borderColor = 'var(--line)';
+              }}
+            >
+              <LogOut size={16} />
+              Sair
+            </button>
           </div>
         </div>
+      </header>
 
-        {/* Appointment Details */}
-        <div>
-          {selectedAppointment ? (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Detalhes da Consulta
-              </h3>
+      <main style={{ width: 'min(100%, var(--container))', marginInline: 'auto' }} role="main">
+        {/* Page Header */}
+        <section style={{
+          background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+          backdropFilter: 'blur(6px)',
+          border: '1px solid var(--line)',
+          borderRadius: '22px',
+          boxShadow: 'var(--shadow-1)',
+          padding: '32px',
+          marginBottom: '32px',
+          backgroundImage: 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
+          color: '#fff'
+        }}>
+          <div>
+            <h1 style={{ 
+              margin: '0 0 8px', 
+              fontSize: 'clamp(1.8rem, 1.6rem + 1vw, 2.4rem)', 
+              lineHeight: '1.2',
+              fontWeight: '800'
+            }}>
+              Histórico Médico
+            </h1>
+            <p style={{ 
+              margin: '0', 
+              opacity: '0.9',
+              fontSize: '1.1rem'
+            }}>
+              Acompanhe suas consultas e resultados
+            </p>
+          </div>
+        </section>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gap: '32px'
+        }}>
+          {/* Appointments List */}
+          <div style={{ minWidth: '0' }}>
+            <div style={{
+              background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+              backdropFilter: 'blur(6px)',
+              border: '1px solid var(--line)',
+              borderRadius: '20px',
+              boxShadow: 'var(--shadow-1)',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                padding: '24px',
+                borderBottom: '1px solid var(--line)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <h2 style={{ 
+                  margin: '0', 
+                  fontSize: '1.25rem', 
+                  fontWeight: '700',
+                  color: 'var(--text)'
+                }}>
+                  Consultas Realizadas
+                </h2>
+              </div>
               
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium text-gray-900">Profissional</h4>
-                  <p className="text-gray-600">{selectedAppointment.professional?.name}</p>
-                  <p className="text-sm text-gray-500">{selectedAppointment.professional?.specialty}</p>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900">Data e Horário</h4>
-                  <p className="text-gray-600">
-                    {formatDate(selectedAppointment.appointment_date)} às {formatTime(selectedAppointment.appointment_date)}
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900">Tipo</h4>
-                  <p className="text-gray-600 capitalize">
-                    {selectedAppointment.type === 'presential' ? 'Presencial' : 'Online'}
-                  </p>
-                </div>
-
-                {selectedAppointment.diagnosis && (
-                  <div>
-                    <h4 className="font-medium text-gray-900">Diagnóstico</h4>
-                    <p className="text-gray-600">{selectedAppointment.diagnosis}</p>
-                  </div>
-                )}
-
-                {selectedAppointment.prescription && (
-                  <div>
-                    <h4 className="font-medium text-gray-900">Prescrição</h4>
-                    <p className="text-gray-600">{selectedAppointment.prescription}</p>
-                  </div>
-                )}
-
-                {selectedAppointment.results?.length > 0 && (
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Resultados</h4>
-                    <div className="space-y-2">
-                      {selectedAppointment.results.map((result) => (
-                        <div key={result.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center space-x-3">
-                            <FileText className="w-5 h-5 text-gray-400" />
-                            <div>
-                              <p className="font-medium text-gray-900">{result.title}</p>
-                              <p className="text-sm text-gray-600">
-                                {formatDate(result.created_at)}
-                              </p>
+              <div>
+                {isLoading ? (
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} style={{
+                      padding: '24px',
+                      borderBottom: '1px solid var(--line)',
+                      animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          background: 'var(--surface-2)',
+                          borderRadius: '12px'
+                        }}></div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{
+                            height: '16px',
+                            background: 'var(--surface-2)',
+                            borderRadius: '8px',
+                            width: '75%',
+                            marginBottom: '8px'
+                          }}></div>
+                          <div style={{
+                            height: '12px',
+                            background: 'var(--surface-2)',
+                            borderRadius: '6px',
+                            width: '50%'
+                          }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : appointments?.length > 0 ? (
+                  appointments.map((appointment) => (
+                    <div
+                      key={appointment.id}
+                      style={{
+                        padding: '24px',
+                        borderBottom: '1px solid var(--line)',
+                        cursor: 'pointer',
+                        transition: '.2s background-color ease'
+                      }}
+                      onClick={() => setSelectedAppointment(appointment)}
+                      onMouseEnter={(e) => {
+                        e.target.style.background = 'var(--surface-2)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.background = 'transparent';
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                          <div style={{
+                            width: '48px',
+                            height: '48px',
+                            background: 'var(--primary-100)',
+                            borderRadius: '12px',
+                            display: 'grid',
+                            placeItems: 'center'
+                          }}>
+                            <User size={24} style={{ color: 'var(--primary-600)' }} />
+                          </div>
+                          <div>
+                            <h3 style={{
+                              margin: '0 0 4px',
+                              fontWeight: '600',
+                              color: 'var(--text)'
+                            }}>
+                              {appointment.professional?.name}
+                            </h3>
+                            <p style={{
+                              margin: '0 0 8px',
+                              fontSize: '.9rem',
+                              color: 'var(--muted)'
+                            }}>
+                              {appointment.professional?.specialty}
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                fontSize: '.85rem',
+                                color: 'var(--muted)'
+                              }}>
+                                <Calendar size={14} style={{ marginRight: '4px' }} />
+                                {formatDate(appointment.appointment_date)}
+                              </div>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                fontSize: '.85rem',
+                                color: 'var(--muted)'
+                              }}>
+                                <Clock size={14} style={{ marginRight: '4px' }} />
+                                {formatTime(appointment.appointment_date)}
+                              </div>
                             </div>
                           </div>
-                          <button className="text-primary-600 hover:text-primary-700">
-                            <Download className="w-4 h-4" />
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <span style={{
+                            padding: '4px 12px',
+                            fontSize: '.75rem',
+                            fontWeight: '600',
+                            borderRadius: '20px',
+                            background: getStatusColor(appointment.status).includes('green') ? 'var(--success-100)' : 
+                                       getStatusColor(appointment.status).includes('red') ? 'var(--error-100)' : 
+                                       getStatusColor(appointment.status).includes('blue') ? 'var(--primary-100)' : 'var(--surface-2)',
+                            color: getStatusColor(appointment.status).includes('green') ? 'var(--success-600)' : 
+                                   getStatusColor(appointment.status).includes('red') ? 'var(--error-600)' : 
+                                   getStatusColor(appointment.status).includes('blue') ? 'var(--primary-600)' : 'var(--muted)'
+                          }}>
+                            {getStatusText(appointment.status)}
+                          </span>
+                          <button style={{
+                            color: 'var(--primary-600)',
+                            fontSize: '.9rem',
+                            fontWeight: '600',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer'
+                          }}>
+                            Ver detalhes
                           </button>
                         </div>
-                      ))}
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '48px 0' }}>
+                    <Calendar size={64} style={{ color: 'var(--muted)', margin: '0 auto 16px' }} />
+                    <h3 style={{
+                      margin: '0 0 8px',
+                      fontSize: '1.2rem',
+                      fontWeight: '600',
+                      color: 'var(--text)'
+                    }}>
+                      Nenhuma consulta encontrada
+                    </h3>
+                    <p style={{
+                      margin: '0',
+                      color: 'var(--muted)'
+                    }}>
+                      Suas consultas realizadas aparecerão aqui
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-          ) : (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="text-center">
-                <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="font-medium text-gray-900 mb-2">
-                  Selecione uma consulta
+          </div>
+
+          {/* Appointment Details */}
+          <div>
+            {selectedAppointment ? (
+              <div style={{
+                background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+                backdropFilter: 'blur(6px)',
+                border: '1px solid var(--line)',
+                borderRadius: '18px',
+                boxShadow: 'var(--shadow-1)',
+                padding: '24px'
+              }}>
+                <h3 style={{
+                  margin: '0 0 20px',
+                  fontSize: '1.1rem',
+                  fontWeight: '700',
+                  color: 'var(--text)'
+                }}>
+                  Detalhes da Consulta
                 </h3>
-                <p className="text-sm text-gray-600">
-                  Clique em uma consulta para ver os detalhes
-                </p>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div>
+                    <h4 style={{
+                      margin: '0 0 8px',
+                      fontWeight: '600',
+                      color: 'var(--text)'
+                    }}>
+                      Profissional
+                    </h4>
+                    <p style={{
+                      margin: '0 0 4px',
+                      color: 'var(--muted)'
+                    }}>
+                      {selectedAppointment.professional?.name}
+                    </p>
+                    <p style={{
+                      margin: '0',
+                      fontSize: '.9rem',
+                      color: 'var(--muted)'
+                    }}>
+                      {selectedAppointment.professional?.specialty}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 style={{
+                      margin: '0 0 8px',
+                      fontWeight: '600',
+                      color: 'var(--text)'
+                    }}>
+                      Data e Horário
+                    </h4>
+                    <p style={{
+                      margin: '0',
+                      color: 'var(--muted)'
+                    }}>
+                      {formatDate(selectedAppointment.appointment_date)} às {formatTime(selectedAppointment.appointment_date)}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 style={{
+                      margin: '0 0 8px',
+                      fontWeight: '600',
+                      color: 'var(--text)'
+                    }}>
+                      Tipo
+                    </h4>
+                    <p style={{
+                      margin: '0',
+                      color: 'var(--muted)',
+                      textTransform: 'capitalize'
+                    }}>
+                      {selectedAppointment.type === 'presential' ? 'Presencial' : 'Online'}
+                    </p>
+                  </div>
+
+                  {selectedAppointment.diagnosis && (
+                    <div>
+                      <h4 style={{
+                        margin: '0 0 8px',
+                        fontWeight: '600',
+                        color: 'var(--text)'
+                      }}>
+                        Diagnóstico
+                      </h4>
+                      <p style={{
+                        margin: '0',
+                        color: 'var(--muted)'
+                      }}>
+                        {selectedAppointment.diagnosis}
+                      </p>
+                    </div>
+                  )}
+
+                  {selectedAppointment.prescription && (
+                    <div>
+                      <h4 style={{
+                        margin: '0 0 8px',
+                        fontWeight: '600',
+                        color: 'var(--text)'
+                      }}>
+                        Prescrição
+                      </h4>
+                      <p style={{
+                        margin: '0',
+                        color: 'var(--muted)'
+                      }}>
+                        {selectedAppointment.prescription}
+                      </p>
+                    </div>
+                  )}
+
+                  {selectedAppointment.results?.length > 0 && (
+                    <div>
+                      <h4 style={{
+                        margin: '0 0 12px',
+                        fontWeight: '600',
+                        color: 'var(--text)'
+                      }}>
+                        Resultados
+                      </h4>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {selectedAppointment.results.map((result) => (
+                          <div key={result.id} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '16px',
+                            background: 'var(--surface-2)',
+                            borderRadius: '12px',
+                            border: '1px solid var(--line)'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <FileText size={20} style={{ color: 'var(--muted)' }} />
+                              <div>
+                                <p style={{
+                                  margin: '0 0 4px',
+                                  fontWeight: '600',
+                                  color: 'var(--text)'
+                                }}>
+                                  {result.title}
+                                </p>
+                                <p style={{
+                                  margin: '0',
+                                  fontSize: '.85rem',
+                                  color: 'var(--muted)'
+                                }}>
+                                  {formatDate(result.created_at)}
+                                </p>
+                              </div>
+                            </div>
+                            <button style={{
+                              color: 'var(--primary-600)',
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '8px',
+                              borderRadius: '8px',
+                              transition: '.2s background-color ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.background = 'var(--primary-100)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.background = 'none';
+                            }}
+                            >
+                              <Download size={16} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            ) : (
+              <div style={{
+                background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+                backdropFilter: 'blur(6px)',
+                border: '1px solid var(--line)',
+                borderRadius: '18px',
+                boxShadow: 'var(--shadow-1)',
+                padding: '24px'
+              }}>
+                <div style={{ textAlign: 'center' }}>
+                  <FileText size={48} style={{ color: 'var(--muted)', margin: '0 auto 16px' }} />
+                  <h3 style={{
+                    margin: '0 0 8px',
+                    fontWeight: '600',
+                    color: 'var(--text)'
+                  }}>
+                    Selecione uma consulta
+                  </h3>
+                  <p style={{
+                    margin: '0',
+                    fontSize: '.9rem',
+                    color: 'var(--muted)'
+                  }}>
+                    Clique em uma consulta para ver os detalhes
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </main>
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
     </div>
   )
 }

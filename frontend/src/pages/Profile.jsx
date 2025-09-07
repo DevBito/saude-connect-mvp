@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '../context/AuthContext'
-import { User, Mail, Phone, Calendar, MapPin, Lock, Save } from 'lucide-react'
+import { User, Mail, Phone, Calendar, MapPin, Lock, Save, LogOut, ArrowLeft } from 'lucide-react'
 
 export default function Profile() {
-  const { user, updateUser } = useAuth()
+  const { user, updateUser, logout } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -51,253 +52,809 @@ export default function Profile() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Meu Perfil</h1>
-        <p className="text-gray-600">Gerencie suas informações pessoais</p>
-      </div>
+    <div style={{
+      minHeight: '100vh',
+      font: '400 1rem/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"',
+      color: 'var(--text)',
+      background: `
+        radial-gradient(800px 400px at 20% -10%, color-mix(in srgb, var(--secondary-500) 14%, transparent), transparent 70%),
+        radial-gradient(900px 500px at 80% -20%, color-mix(in srgb, var(--primary-500) 16%, transparent), transparent 70%),
+        linear-gradient(180deg, #fff, var(--surface-2))
+      `,
+      WebkitFontSmoothing: 'antialiased',
+      MozOsxFontSmoothing: 'grayscale',
+      padding: '28px'
+    }}>
+      {/* Header */}
+      <header style={{
+        position: 'sticky',
+        top: '0',
+        zIndex: '50',
+        backdropFilter: 'saturate(140%) blur(10px)',
+        background: 'color-mix(in srgb, var(--surface) 80%, transparent)',
+        borderBottom: '1px solid var(--line)',
+        borderRadius: '16px',
+        marginBottom: '32px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: '72px',
+          padding: '0 24px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Link 
+              to="/dashboard" 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: 'var(--muted)',
+                textDecoration: 'none',
+                fontSize: '.9rem',
+                fontWeight: '600'
+              }}
+            >
+              <ArrowLeft size={16} />
+              Voltar
+            </Link>
+            <Link 
+              to="/" 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                fontWeight: '800',
+                letterSpacing: '.2px',
+                textDecoration: 'none',
+                color: 'inherit'
+              }}
+            >
+              <span style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                display: 'grid',
+                placeItems: 'center',
+                color: '#fff',
+                background: 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
+                boxShadow: 'var(--shadow-2)',
+                fontWeight: '800',
+                fontSize: '20px'
+              }}>S</span>
+              <span>Saúde Connect</span>
+            </Link>
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile Card */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="text-center">
-              <div className="w-24 h-24 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-primary-600">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button
+              onClick={logout}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 16px',
+                borderRadius: '10px',
+                fontWeight: '600',
+                fontSize: '.9rem',
+                border: '1px solid var(--line)',
+                cursor: 'pointer',
+                transition: '.2s border-color ease',
+                background: 'var(--surface)',
+                color: 'var(--text)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 30%, var(--line))';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.borderColor = 'var(--line)';
+              }}
+            >
+              <LogOut size={16} />
+              Sair
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main style={{ width: 'min(100%, var(--container))', marginInline: 'auto' }} role="main">
+        {/* Page Header */}
+        <section style={{
+          background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+          backdropFilter: 'blur(6px)',
+          border: '1px solid var(--line)',
+          borderRadius: '22px',
+          boxShadow: 'var(--shadow-1)',
+          padding: '32px',
+          marginBottom: '32px',
+          backgroundImage: 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
+          color: '#fff'
+        }}>
+          <div>
+            <h1 style={{ 
+              margin: '0 0 8px', 
+              fontSize: 'clamp(1.8rem, 1.6rem + 1vw, 2.4rem)', 
+              lineHeight: '1.2',
+              fontWeight: '800'
+            }}>
+              Meu Perfil
+            </h1>
+            <p style={{ 
+              margin: '0', 
+              opacity: '0.9',
+              fontSize: '1.1rem'
+            }}>
+              Gerencie suas informações pessoais
+            </p>
+          </div>
+        </section>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gap: '32px'
+        }}>
+          {/* Profile Card */}
+          <div>
+            <div style={{
+              background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+              backdropFilter: 'blur(6px)',
+              border: '1px solid var(--line)',
+              borderRadius: '20px',
+              boxShadow: 'var(--shadow-1)',
+              padding: '32px',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                width: '96px',
+                height: '96px',
+                background: 'var(--primary-100)',
+                borderRadius: '50%',
+                display: 'grid',
+                placeItems: 'center',
+                margin: '0 auto 20px'
+              }}>
+                <span style={{
+                  fontSize: '2rem',
+                  fontWeight: '800',
+                  color: 'var(--primary-600)'
+                }}>
                   {user?.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">{user?.name}</h2>
-              <p className="text-gray-600">{user?.email}</p>
-              <div className="mt-4">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  Conta ativa
-                </span>
-              </div>
+              <h2 style={{
+                margin: '0 0 8px',
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: 'var(--text)'
+              }}>
+                {user?.name}
+              </h2>
+              <p style={{
+                margin: '0 0 20px',
+                color: 'var(--muted)'
+              }}>
+                {user?.email}
+              </p>
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '6px 16px',
+                borderRadius: '20px',
+                fontSize: '.85rem',
+                fontWeight: '600',
+                background: 'var(--success-100)',
+                color: 'var(--success-600)'
+              }}>
+                Conta ativa
+              </span>
             </div>
           </div>
-        </div>
 
-        {/* Profile Form */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Informações Pessoais</h2>
+          {/* Profile Form */}
+          <div>
+            <div style={{
+              background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+              backdropFilter: 'blur(6px)',
+              border: '1px solid var(--line)',
+              borderRadius: '20px',
+              boxShadow: 'var(--shadow-1)',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                padding: '24px',
+                borderBottom: '1px solid var(--line)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <h2 style={{
+                  margin: '0',
+                  fontSize: '1.25rem',
+                  fontWeight: '700',
+                  color: 'var(--text)'
+                }}>
+                  Informações Pessoais
+                </h2>
                 {!isEditing && (
                   <button
                     onClick={handleEdit}
-                    className="btn btn-secondary btn-sm"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 16px',
+                      borderRadius: '10px',
+                      fontWeight: '600',
+                      fontSize: '.9rem',
+                      border: '1px solid var(--line)',
+                      cursor: 'pointer',
+                      transition: '.2s border-color ease',
+                      background: 'var(--surface)',
+                      color: 'var(--text)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 30%, var(--line))';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.borderColor = 'var(--line)';
+                    }}
                   >
                     Editar
                   </button>
                 )}
               </div>
-            </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Name */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nome completo
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-gray-400" />
+              <form onSubmit={handleSubmit(onSubmit)} style={{ padding: '24px' }}>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                  gap: '20px'
+                }}>
+                  {/* Name */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '.9rem',
+                      fontWeight: '600',
+                      color: 'var(--text)',
+                      marginBottom: '8px'
+                    }}>
+                      Nome completo
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '12px',
+                        transform: 'translateY(-50%)',
+                        color: 'var(--muted)'
+                      }}>
+                        <User size={20} />
+                      </div>
+                      <input
+                        {...register('name', {
+                          required: 'Nome é obrigatório',
+                          minLength: {
+                            value: 2,
+                            message: 'Nome deve ter pelo menos 2 caracteres'
+                          }
+                        })}
+                        type="text"
+                        disabled={!isEditing}
+                        style={{
+                          width: '100%',
+                          padding: '12px 12px 12px 44px',
+                          border: '1px solid var(--line)',
+                          borderRadius: '12px',
+                          background: isEditing ? 'var(--surface)' : 'var(--surface-2)',
+                          color: isEditing ? 'var(--text)' : 'var(--muted)',
+                          fontSize: '1rem',
+                          transition: '.2s border-color ease, .2s box-shadow ease'
+                        }}
+                        onFocus={(e) => {
+                          if (isEditing) {
+                            e.target.style.outline = 'none';
+                            e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 50%, var(--line))';
+                            e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--primary-600) 18%, transparent)';
+                          }
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'var(--line)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
                     </div>
-                    <input
-                      {...register('name', {
-                        required: 'Nome é obrigatório',
-                        minLength: {
-                          value: 2,
-                          message: 'Nome deve ter pelo menos 2 caracteres'
-                        }
-                      })}
-                      type="text"
-                      disabled={!isEditing}
-                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:text-gray-500"
-                    />
-                  </div>
-                  {errors.name && (
-                    <p className="mt-1 text-sm text-error-600">{errors.name.message}</p>
-                  )}
-                </div>
-
-                {/* Email */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      {...register('email', {
-                        required: 'Email é obrigatório',
-                        pattern: {
-                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: 'Email inválido'
-                        }
-                      })}
-                      type="email"
-                      disabled={!isEditing}
-                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:text-gray-500"
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-error-600">{errors.email.message}</p>
-                  )}
-                </div>
-
-                {/* Phone */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Telefone
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Phone className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      {...register('phone')}
-                      type="tel"
-                      disabled={!isEditing}
-                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:text-gray-500"
-                      placeholder="(11) 99999-9999"
-                    />
-                  </div>
-                </div>
-
-                {/* Birth Date */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Data de nascimento
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Calendar className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      {...register('birth_date')}
-                      type="date"
-                      disabled={!isEditing}
-                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:text-gray-500"
-                    />
-                  </div>
-                </div>
-
-                {/* Gender */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Gênero
-                  </label>
-                  <select
-                    {...register('gender')}
-                    disabled={!isEditing}
-                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  >
-                    <option value="">Selecione</option>
-                    <option value="masculino">Masculino</option>
-                    <option value="feminino">Feminino</option>
-                    <option value="outro">Outro</option>
-                  </select>
-                </div>
-
-                {/* Address */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Endereço
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <MapPin className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      {...register('address')}
-                      type="text"
-                      disabled={!isEditing}
-                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:text-gray-500"
-                      placeholder="Rua, número, bairro"
-                    />
-                  </div>
-                </div>
-
-                {/* City */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Cidade
-                  </label>
-                  <input
-                    {...register('city')}
-                    type="text"
-                    disabled={!isEditing}
-                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                </div>
-
-                {/* State */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Estado
-                  </label>
-                  <input
-                    {...register('state')}
-                    type="text"
-                    maxLength="2"
-                    disabled={!isEditing}
-                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="SP"
-                  />
-                </div>
-              </div>
-
-              {isEditing && (
-                <div className="flex items-center justify-end space-x-3 mt-6 pt-6 border-t border-gray-200">
-                  <button
-                    type="button"
-                    onClick={handleCancel}
-                    className="btn btn-secondary"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="btn btn-primary flex items-center gap-2"
-                  >
-                    {isLoading ? (
-                      <>
-                        <div className="spinner"></div>
-                        Salvando...
-                      </>
-                    ) : (
-                      <>
-                        <Save size={16} />
-                        Salvar alterações
-                      </>
+                    {errors.name && (
+                      <p style={{
+                        margin: '4px 0 0',
+                        fontSize: '.85rem',
+                        color: 'var(--error-600)'
+                      }}>
+                        {errors.name.message}
+                      </p>
                     )}
-                  </button>
-                </div>
-              )}
-            </form>
-          </div>
+                  </div>
 
-          {/* Change Password */}
-          <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Alterar Senha</h2>
+                  {/* Email */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '.9rem',
+                      fontWeight: '600',
+                      color: 'var(--text)',
+                      marginBottom: '8px'
+                    }}>
+                      Email
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '12px',
+                        transform: 'translateY(-50%)',
+                        color: 'var(--muted)'
+                      }}>
+                        <Mail size={20} />
+                      </div>
+                      <input
+                        {...register('email', {
+                          required: 'Email é obrigatório',
+                          pattern: {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: 'Email inválido'
+                          }
+                        })}
+                        type="email"
+                        disabled={!isEditing}
+                        style={{
+                          width: '100%',
+                          padding: '12px 12px 12px 44px',
+                          border: '1px solid var(--line)',
+                          borderRadius: '12px',
+                          background: isEditing ? 'var(--surface)' : 'var(--surface-2)',
+                          color: isEditing ? 'var(--text)' : 'var(--muted)',
+                          fontSize: '1rem',
+                          transition: '.2s border-color ease, .2s box-shadow ease'
+                        }}
+                        onFocus={(e) => {
+                          if (isEditing) {
+                            e.target.style.outline = 'none';
+                            e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 50%, var(--line))';
+                            e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--primary-600) 18%, transparent)';
+                          }
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'var(--line)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
+                    </div>
+                    {errors.email && (
+                      <p style={{
+                        margin: '4px 0 0',
+                        fontSize: '.85rem',
+                        color: 'var(--error-600)'
+                      }}>
+                        {errors.email.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Phone */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '.9rem',
+                      fontWeight: '600',
+                      color: 'var(--text)',
+                      marginBottom: '8px'
+                    }}>
+                      Telefone
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '12px',
+                        transform: 'translateY(-50%)',
+                        color: 'var(--muted)'
+                      }}>
+                        <Phone size={20} />
+                      </div>
+                      <input
+                        {...register('phone')}
+                        type="tel"
+                        disabled={!isEditing}
+                        placeholder="(11) 99999-9999"
+                        style={{
+                          width: '100%',
+                          padding: '12px 12px 12px 44px',
+                          border: '1px solid var(--line)',
+                          borderRadius: '12px',
+                          background: isEditing ? 'var(--surface)' : 'var(--surface-2)',
+                          color: isEditing ? 'var(--text)' : 'var(--muted)',
+                          fontSize: '1rem',
+                          transition: '.2s border-color ease, .2s box-shadow ease'
+                        }}
+                        onFocus={(e) => {
+                          if (isEditing) {
+                            e.target.style.outline = 'none';
+                            e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 50%, var(--line))';
+                            e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--primary-600) 18%, transparent)';
+                          }
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'var(--line)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Birth Date */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '.9rem',
+                      fontWeight: '600',
+                      color: 'var(--text)',
+                      marginBottom: '8px'
+                    }}>
+                      Data de nascimento
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '12px',
+                        transform: 'translateY(-50%)',
+                        color: 'var(--muted)'
+                      }}>
+                        <Calendar size={20} />
+                      </div>
+                      <input
+                        {...register('birth_date')}
+                        type="date"
+                        disabled={!isEditing}
+                        style={{
+                          width: '100%',
+                          padding: '12px 12px 12px 44px',
+                          border: '1px solid var(--line)',
+                          borderRadius: '12px',
+                          background: isEditing ? 'var(--surface)' : 'var(--surface-2)',
+                          color: isEditing ? 'var(--text)' : 'var(--muted)',
+                          fontSize: '1rem',
+                          transition: '.2s border-color ease, .2s box-shadow ease'
+                        }}
+                        onFocus={(e) => {
+                          if (isEditing) {
+                            e.target.style.outline = 'none';
+                            e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 50%, var(--line))';
+                            e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--primary-600) 18%, transparent)';
+                          }
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'var(--line)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Gender */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '.9rem',
+                      fontWeight: '600',
+                      color: 'var(--text)',
+                      marginBottom: '8px'
+                    }}>
+                      Gênero
+                    </label>
+                    <select
+                      {...register('gender')}
+                      disabled={!isEditing}
+                      style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        border: '1px solid var(--line)',
+                        borderRadius: '12px',
+                        background: isEditing ? 'var(--surface)' : 'var(--surface-2)',
+                        color: isEditing ? 'var(--text)' : 'var(--muted)',
+                        fontSize: '1rem',
+                        cursor: isEditing ? 'pointer' : 'not-allowed'
+                      }}
+                    >
+                      <option value="">Selecione</option>
+                      <option value="masculino">Masculino</option>
+                      <option value="feminino">Feminino</option>
+                      <option value="outro">Outro</option>
+                    </select>
+                  </div>
+
+                  {/* Address */}
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '.9rem',
+                      fontWeight: '600',
+                      color: 'var(--text)',
+                      marginBottom: '8px'
+                    }}>
+                      Endereço
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '12px',
+                        transform: 'translateY(-50%)',
+                        color: 'var(--muted)'
+                      }}>
+                        <MapPin size={20} />
+                      </div>
+                      <input
+                        {...register('address')}
+                        type="text"
+                        disabled={!isEditing}
+                        placeholder="Rua, número, bairro"
+                        style={{
+                          width: '100%',
+                          padding: '12px 12px 12px 44px',
+                          border: '1px solid var(--line)',
+                          borderRadius: '12px',
+                          background: isEditing ? 'var(--surface)' : 'var(--surface-2)',
+                          color: isEditing ? 'var(--text)' : 'var(--muted)',
+                          fontSize: '1rem',
+                          transition: '.2s border-color ease, .2s box-shadow ease'
+                        }}
+                        onFocus={(e) => {
+                          if (isEditing) {
+                            e.target.style.outline = 'none';
+                            e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 50%, var(--line))';
+                            e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--primary-600) 18%, transparent)';
+                          }
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'var(--line)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* City */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '.9rem',
+                      fontWeight: '600',
+                      color: 'var(--text)',
+                      marginBottom: '8px'
+                    }}>
+                      Cidade
+                    </label>
+                    <input
+                      {...register('city')}
+                      type="text"
+                      disabled={!isEditing}
+                      style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        border: '1px solid var(--line)',
+                        borderRadius: '12px',
+                        background: isEditing ? 'var(--surface)' : 'var(--surface-2)',
+                        color: isEditing ? 'var(--text)' : 'var(--muted)',
+                        fontSize: '1rem',
+                        transition: '.2s border-color ease, .2s box-shadow ease'
+                      }}
+                      onFocus={(e) => {
+                        if (isEditing) {
+                          e.target.style.outline = 'none';
+                          e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 50%, var(--line))';
+                          e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--primary-600) 18%, transparent)';
+                        }
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = 'var(--line)';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
+                  </div>
+
+                  {/* State */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '.9rem',
+                      fontWeight: '600',
+                      color: 'var(--text)',
+                      marginBottom: '8px'
+                    }}>
+                      Estado
+                    </label>
+                    <input
+                      {...register('state')}
+                      type="text"
+                      maxLength="2"
+                      disabled={!isEditing}
+                      placeholder="SP"
+                      style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        border: '1px solid var(--line)',
+                        borderRadius: '12px',
+                        background: isEditing ? 'var(--surface)' : 'var(--surface-2)',
+                        color: isEditing ? 'var(--text)' : 'var(--muted)',
+                        fontSize: '1rem',
+                        transition: '.2s border-color ease, .2s box-shadow ease'
+                      }}
+                      onFocus={(e) => {
+                        if (isEditing) {
+                          e.target.style.outline = 'none';
+                          e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 50%, var(--line))';
+                          e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--primary-600) 18%, transparent)';
+                        }
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = 'var(--line)';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {isEditing && (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    gap: '12px',
+                    marginTop: '24px',
+                    paddingTop: '24px',
+                    borderTop: '1px solid var(--line)'
+                  }}>
+                    <button
+                      type="button"
+                      onClick={handleCancel}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '12px 20px',
+                        borderRadius: '12px',
+                        fontWeight: '600',
+                        fontSize: '.95rem',
+                        border: '1px solid var(--line)',
+                        cursor: 'pointer',
+                        transition: '.2s border-color ease',
+                        background: 'var(--surface)',
+                        color: 'var(--text)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 30%, var(--line))';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.borderColor = 'var(--line)';
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '12px 20px',
+                        borderRadius: '12px',
+                        fontWeight: '600',
+                        fontSize: '.95rem',
+                        border: '1px solid transparent',
+                        cursor: isLoading ? 'not-allowed' : 'pointer',
+                        transition: '.2s transform ease, .25s box-shadow ease, .2s filter ease',
+                        background: 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
+                        color: '#fff',
+                        boxShadow: 'var(--shadow-2)',
+                        opacity: isLoading ? 0.7 : 1
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isLoading) {
+                          e.target.style.filter = 'brightness(1.05)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.filter = 'none';
+                      }}
+                    >
+                      {isLoading ? (
+                        <>
+                          <div style={{
+                            width: '16px',
+                            height: '16px',
+                            border: '2px solid transparent',
+                            borderTop: '2px solid currentColor',
+                            borderRadius: '50%',
+                            animation: 'spin 1s linear infinite'
+                          }}></div>
+                          Salvando...
+                        </>
+                      ) : (
+                        <>
+                          <Save size={16} />
+                          Salvar alterações
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </form>
             </div>
-            <div className="p-6">
-              <button className="btn btn-secondary flex items-center gap-2">
-                <Lock size={16} />
-                Alterar senha
-              </button>
+
+            {/* Change Password */}
+            <div style={{
+              marginTop: '24px',
+              background: 'color-mix(in srgb, var(--surface) 92%, transparent)',
+              backdropFilter: 'blur(6px)',
+              border: '1px solid var(--line)',
+              borderRadius: '20px',
+              boxShadow: 'var(--shadow-1)',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                padding: '24px',
+                borderBottom: '1px solid var(--line)'
+              }}>
+                <h2 style={{
+                  margin: '0',
+                  fontSize: '1.25rem',
+                  fontWeight: '700',
+                  color: 'var(--text)'
+                }}>
+                  Alterar Senha
+                </h2>
+              </div>
+              <div style={{ padding: '24px' }}>
+                <button style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '12px 20px',
+                  borderRadius: '12px',
+                  fontWeight: '600',
+                  fontSize: '.95rem',
+                  border: '1px solid var(--line)',
+                  cursor: 'pointer',
+                  transition: '.2s border-color ease',
+                  background: 'var(--surface)',
+                  color: 'var(--text)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.borderColor = 'color-mix(in srgb, var(--primary-600) 30%, var(--line))';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.borderColor = 'var(--line)';
+                }}
+                >
+                  <Lock size={16} />
+                  Alterar senha
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
+
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }

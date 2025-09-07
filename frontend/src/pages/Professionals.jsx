@@ -205,7 +205,7 @@ export default function Professionals() {
               lineHeight: '1.2',
               fontWeight: '800'
             }}>
-              Profissionais de Saúde 👨‍⚕️
+              Profissionais de Saúde
             </h1>
             <p style={{ 
               margin: '0', 
