@@ -2,7 +2,7 @@
 
 Sistema de agendamento de consultas médicas online desenvolvido como MVP para o Projeto Integrador.
 
-## 🚀 Funcionalidades
+## Funcionalidades
 
 - **Autenticação Segura**: Login e cadastro com JWT
 - **Dashboard Intuitivo**: Visualização de consultas e estatísticas
@@ -12,7 +12,7 @@ Sistema de agendamento de consultas médicas online desenvolvido como MVP para o
 - **Interface Mobile-First**: Design responsivo otimizado para dispositivos móveis
 - **Painel Administrativo**: Gestão de profissionais e usuários
 
-## 🛠️ Tecnologias
+## Tecnologias
 
 ### Frontend
 - **React 18** com Vite
@@ -34,7 +34,7 @@ Sistema de agendamento de consultas médicas online desenvolvido como MVP para o
 - **Vercel** para frontend e backend
 - **Railway/Supabase** para banco de dados
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 saude-connect-mvp/
@@ -58,7 +58,7 @@ saude-connect-mvp/
 └── vercel.json           # Configuração de deploy
 ```
 
-## 🚀 Como Executar
+## Como Executar
 
 ### Pré-requisitos
 - Node.js 18+
@@ -114,7 +114,7 @@ A aplicação estará disponível em:
 - Frontend: http://localhost:3000
 - Backend: http://localhost:5000
 
-## 📱 Personas e Jornadas
+## Personas e Jornadas
 
 ### Cristina Almeida (35 anos)
 - **Necessidade**: Agendamento ginecológico
@@ -128,7 +128,7 @@ A aplicação estará disponível em:
 - **Necessidade**: Atendimento psicológico remoto
 - **Jornada**: Cadastro → Triagem → Sessão online → Diário emocional
 
-## 🔧 Scripts Disponíveis
+## Scripts Disponíveis
 
 ### Frontend
 ```bash
@@ -145,7 +145,7 @@ npm start        # Produção
 npm test         # Testes
 ```
 
-## 🚀 Deploy no Vercel
+## Deploy no Vercel
 
 ### 1. Configure as variáveis de ambiente no Vercel
 - `DATABASE_URL`: URL do banco PostgreSQL
@@ -162,7 +162,7 @@ vercel --prod
 - Use Railway, Supabase ou Neon para PostgreSQL
 - Configure a URL de conexão nas variáveis de ambiente
 
-## 📊 Banco de Dados
+## Banco de Dados
 
 ### Principais Tabelas
 - `users`: Usuários (pacientes)
@@ -172,7 +172,7 @@ vercel --prod
 - `reviews`: Avaliações
 - `specialties`: Especialidades médicas
 
-## 🔒 Segurança
+## Segurança
 
 - Autenticação JWT
 - Hash de senhas com bcrypt
@@ -181,7 +181,7 @@ vercel --prod
 - CORS configurado
 - Headers de segurança com Helmet
 
-## 📈 Próximos Passos
+## Próximos Passos
 
 1. **Implementar funcionalidades restantes**:
    - Sistema de notificações
@@ -199,7 +199,7 @@ vercel --prod
    - Sistemas de telemedicina
    - Integração com laboratórios
 
-## 🤝 Contribuição
+## Contribuição
 
 1. Fork o projeto
 2. Crie uma branch para sua feature
@@ -207,11 +207,11 @@ vercel --prod
 4. Push para a branch
 5. Abra um Pull Request
 
-## 📄 Licença
+## Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
 
-## 👥 Equipe
+## Equipe
 
 - Desenvolvedor: [Seu Nome]
 - Orientador: [Nome do Orientador]
