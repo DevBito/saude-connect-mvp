@@ -18,8 +18,14 @@ const app = express();
 // Database connection
 const getDatabaseUrl = () => {
   // Tentar URL completa primeiro
-  if (process.env.SAUDE_POSTGRES_URL) return process.env.SAUDE_POSTGRES_URL;
-  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  if (process.env.SAUDE_POSTGRES_URL) {
+    console.log('✅ Usando SAUDE_POSTGRES_URL');
+    return process.env.SAUDE_POSTGRES_URL;
+  }
+  if (process.env.DATABASE_URL) {
+    console.log('✅ Usando DATABASE_URL');
+    return process.env.DATABASE_URL;
+  }
   
   // Construir URL a partir das variáveis individuais
   const user = process.env.SAUDE_POSTGRES_USER;
@@ -28,9 +34,12 @@ const getDatabaseUrl = () => {
   const database = process.env.SAUDE_POSTGRES_DATABASE;
   
   if (user && password && host && database) {
-    return `postgresql://${user}:${password}@${host}:5432/${database}?sslmode=require`;
+    const constructedUrl = `postgresql://${user}:${password}@${host}:5432/${database}?sslmode=require`;
+    console.log('✅ Construindo URL a partir de variáveis individuais');
+    return constructedUrl;
   }
   
+  console.log('❌ Nenhuma variável de banco encontrada');
   return null;
 };
 
@@ -44,7 +53,10 @@ const getJwtSecret = () => {
 
 const pool = new Pool({
   connectionString: getDatabaseUrl(),
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: {
+    rejectUnauthorized: false,
+    require: true
+  }
 });
 
 // Test database connection
