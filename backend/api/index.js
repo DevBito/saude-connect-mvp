@@ -49,7 +49,8 @@ const pool = new Pool({
   connectionString: getDatabaseUrl(),
   ssl: {
     rejectUnauthorized: false,
-    require: true
+    require: true,
+    checkServerIdentity: () => undefined
   }
 });
 
