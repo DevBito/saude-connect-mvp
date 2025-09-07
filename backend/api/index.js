@@ -17,47 +17,26 @@ const app = express();
 
 // Database connection
 const getDatabaseUrl = () => {
-  let databaseUrl = null;
-  
   // Usar SAUDE_POSTGRES_URL como principal
   if (process.env.SAUDE_POSTGRES_URL) {
     console.log('✅ Usando SAUDE_POSTGRES_URL');
-    databaseUrl = process.env.SAUDE_POSTGRES_URL;
-  } else {
-    // Construir URL a partir das variáveis individuais como fallback
-    const user = process.env.SAUDE_POSTGRES_USER;
-    const password = process.env.SAUDE_POSTGRES_PASSWORD;
-    const host = process.env.SAUDE_POSTGRES_HOST;
-    const database = process.env.SAUDE_POSTGRES_DATABASE;
-    
-    if (user && password && host && database) {
-      databaseUrl = `postgresql://${user}:${password}@${host}:5432/${database}`;
-      console.log('✅ Construindo URL a partir de variáveis individuais');
-    }
+    return process.env.SAUDE_POSTGRES_URL;
   }
   
-  if (!databaseUrl) {
-    console.log('❌ Nenhuma variável de banco encontrada');
-    return null;
+  // Construir URL a partir das variáveis individuais como fallback
+  const user = process.env.SAUDE_POSTGRES_USER;
+  const password = process.env.SAUDE_POSTGRES_PASSWORD;
+  const host = process.env.SAUDE_POSTGRES_HOST;
+  const database = process.env.SAUDE_POSTGRES_DATABASE;
+  
+  if (user && password && host && database) {
+    const constructedUrl = `postgresql://${user}:${password}@${host}:5432/${database}`;
+    console.log('✅ Construindo URL a partir de variáveis individuais');
+    return constructedUrl;
   }
   
-  // Forçar SSL desabilitado
-  console.log('🔧 Forçando SSL desabilitado...');
-  console.log('URL original:', databaseUrl);
-  
-  // Remover parâmetros SSL existentes de forma mais cuidadosa
-  databaseUrl = databaseUrl.replace(/[?&]sslmode=[^&]*/g, '');
-  databaseUrl = databaseUrl.replace(/[?&]ssl=[^&]*/g, '');
-  
-  // Adicionar sslmode=disable
-  if (databaseUrl.includes('?')) {
-    databaseUrl += '&sslmode=disable';
-  } else {
-    databaseUrl += '?sslmode=disable';
-  }
-  
-  console.log('✅ URL final com SSL desabilitado:', databaseUrl);
-  return databaseUrl;
+  console.log('❌ Nenhuma variável de banco encontrada');
+  return null;
 };
 
 // JWT Secret
@@ -67,7 +46,8 @@ const getJwtSecret = () => {
 };
 
 const pool = new Pool({
-  connectionString: getDatabaseUrl()
+  connectionString: getDatabaseUrl(),
+  ssl: false
 });
 
 // Test database connection
@@ -255,8 +235,7 @@ app.get('/api/test', (req, res) => {
 
 // Teste simples de variáveis
 app.get('/api/vars', (req, res) => {
-  const originalUrl = process.env.SAUDE_POSTGRES_URL;
-  const modifiedUrl = getDatabaseUrl();
+  const databaseUrl = getDatabaseUrl();
   
   res.json({
     message: 'Variáveis de ambiente',
@@ -276,12 +255,8 @@ app.get('/api/vars', (req, res) => {
       SAUDE_POSTGRES_HOST: process.env.SAUDE_POSTGRES_HOST ? 'Configurado' : 'Não configurado',
       FRONTEND_URL: process.env.FRONTEND_URL ? 'Configurado' : 'Não configurado'
     },
-    databaseUrl: {
-      original: originalUrl ? 'Configurado' : 'Não configurado',
-      modified: modifiedUrl ? 'URL construída com sucesso' : 'Falha ao construir URL',
-      originalUrl: originalUrl ? originalUrl.substring(0, 50) + '...' : null,
-      modifiedUrl: modifiedUrl ? modifiedUrl.substring(0, 50) + '...' : null
-    },
+    databaseUrl: databaseUrl ? 'URL construída com sucesso' : 'Falha ao construir URL',
+    sslConfig: 'SSL desabilitado no pool',
     jwtSecret: getJwtSecret() !== 'fallback-secret-key' ? 'Configurado' : 'Não configurado'
   });
 });
