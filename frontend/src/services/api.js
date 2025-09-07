@@ -2,6 +2,9 @@ import axios from 'axios'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
+console.log('🌐 VITE_API_URL:', import.meta.env.VITE_API_URL)
+console.log('🌐 API_BASE_URL final:', API_BASE_URL)
+
 // Criar instância do axios
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -15,8 +18,11 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
+    const fullUrl = `${config.baseURL}${config.url}`
+    
     console.log('🔑 Token no localStorage:', token ? `Token presente (${token.substring(0, 20)}...)` : 'Token ausente')
-    console.log('📡 URL da requisição:', config.url)
+    console.log('📡 URL relativa:', config.url)
+    console.log('🌐 URL completa:', fullUrl)
     console.log('📋 Headers antes:', config.headers)
 
     if (token && token !== 'undefined' && token !== 'null') {

@@ -24,29 +24,19 @@ export default function Dashboard() {
   const [upcomingAppointments, setUpcomingAppointments] = useState([])
 
   // Buscar agendamentos do usuário
-  const { data: appointmentsResponse, isLoading } = useQuery(
+  const { data: appointments, isLoading } = useQuery(
     'userAppointments',
     appointmentService.getUserAppointments,
     {
-      onSuccess: (response) => {
-        console.log('📅 Resposta dos appointments:', response)
-        const data = response.data || []
+      onSuccess: (data) => {
         const upcoming = data
-          .filter(apt => new Date(apt.date) > new Date())
-          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .filter(apt => new Date(apt.appointment_date) > new Date())
+          .sort((a, b) => new Date(a.appointment_date) - new Date(b.appointment_date))
           .slice(0, 3)
         setUpcomingAppointments(upcoming)
       }
     }
   )
-
-  // Extrair os dados dos appointments da resposta
-  const appointments = Array.isArray(appointmentsResponse?.data) ? appointmentsResponse.data : []
-  
-  // Debug logs
-  console.log('🔍 appointmentsResponse:', appointmentsResponse)
-  console.log('🔍 appointments (array):', appointments)
-  console.log('🔍 appointments é array?', Array.isArray(appointments))
 
   const formatAppointmentDate = (dateString) => {
     const date = parseISO(dateString)
@@ -88,14 +78,14 @@ export default function Dashboard() {
   const stats = [
     {
       title: 'Consultas Agendadas',
-      value: Array.isArray(appointments) ? appointments.filter(apt => apt.status === 'scheduled').length : 0,
+      value: appointments?.filter(apt => apt.status === 'scheduled').length || 0,
       icon: Calendar,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100'
     },
     {
       title: 'Consultas Realizadas',
-      value: Array.isArray(appointments) ? appointments.filter(apt => apt.status === 'completed').length : 0,
+      value: appointments?.filter(apt => apt.status === 'completed').length || 0,
       icon: TrendingUp,
       color: 'text-green-600',
       bgColor: 'bg-green-100'
