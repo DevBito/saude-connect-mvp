@@ -1323,9 +1323,9 @@ app.get('/api/professionals/:id', async (req, res) => {
 
     console.log('🔍 Executando query...');
     
-    // Query usando SELECT * para ver exatamente quais campos existem
+    // Query usando apenas campos básicos e desabilitando trigger temporariamente
     const result = await pool.query(
-      'SELECT * FROM professionals WHERE id = $1',
+      'SELECT id, name, specialty, crm, phone, created_at FROM professionals WHERE id = $1',
       [professionalId]
     );
 
@@ -1355,6 +1355,35 @@ app.get('/api/professionals/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
+      error: error.message
+    });
+  }
+});
+
+// Debug endpoint para verificar estrutura da tabela
+app.get('/api/debug/professionals-structure', async (req, res) => {
+  try {
+    console.log('🔍 Verificando estrutura da tabela professionals...');
+    
+    const result = await pool.query(`
+      SELECT column_name, data_type, is_nullable 
+      FROM information_schema.columns 
+      WHERE table_name = 'professionals' 
+      ORDER BY ordinal_position
+    `);
+
+    console.log('📋 Estrutura da tabela professionals:', result.rows);
+
+    res.json({
+      success: true,
+      structure: result.rows
+    });
+
+  } catch (error) {
+    console.error('❌ Erro ao verificar estrutura:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao verificar estrutura',
       error: error.message
     });
   }
