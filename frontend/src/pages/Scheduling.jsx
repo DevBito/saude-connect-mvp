@@ -52,12 +52,17 @@ export default function Scheduling() {
       setError('')
 
       const appointmentData = {
-        patient_id: user.id,
-        professional_id: professional.id,
+        patient_id: parseInt(user.id),
+        professional_id: parseInt(professional.id),
         date: selectedDate,
         time: selectedTime,
         notes: ''
       }
+
+      console.log('📅 Dados do agendamento:', appointmentData)
+      console.log('👤 Usuário:', user)
+      console.log('👨‍⚕️ Profissional:', professional)
+      console.log('🔑 Token no localStorage:', localStorage.getItem('token'))
 
       const response = await appointmentService.createAppointment(appointmentData)
       

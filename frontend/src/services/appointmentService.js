@@ -9,7 +9,10 @@ export const appointmentService = {
 
   // Criar agendamento
   async createAppointment(appointmentData) {
+    console.log('📅 appointmentService.createAppointment - Dados:', appointmentData)
+    console.log('📅 appointmentService.createAppointment - URL:', '/appointments')
     const response = await api.post('/appointments', appointmentData)
+    console.log('📅 appointmentService.createAppointment - Resposta:', response.data)
     return response.data
   },
 
