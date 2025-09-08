@@ -159,6 +159,21 @@ router.post('/', authenticateToken, async (req, res, next) => {
     console.log('📅 POST /appointments - Dados recebidos:', req.body)
     console.log('👤 Usuário autenticado:', req.user)
     
+    // Testar conexão com o banco
+    console.log('🔍 Testando conexão com o banco de dados...')
+    const testQuery = await pool.query('SELECT NOW() as current_time')
+    console.log('✅ Conexão com banco OK:', testQuery.rows[0])
+    
+    // Verificar estrutura da tabela appointments
+    console.log('🔍 Verificando estrutura da tabela appointments...')
+    const tableStructure = await pool.query(`
+      SELECT column_name, data_type, is_nullable, column_default 
+      FROM information_schema.columns 
+      WHERE table_name = 'appointments' 
+      ORDER BY ordinal_position
+    `)
+    console.log('📋 Estrutura da tabela appointments:', tableStructure.rows)
+    
     const { professional_id, appointment_date, type = 'presential', notes } = req.body
 
     console.log('🔍 Validação dos campos:')
@@ -197,12 +212,21 @@ router.post('/', authenticateToken, async (req, res, next) => {
 
     // Verify professional exists and is active
     console.log('🔍 Verificando profissional com ID:', professionalIdNum)
+    
+    // Primeiro, verificar se o profissional existe (sem filtro de is_active)
+    const allProfessionalsResult = await pool.query(
+      'SELECT id, name, specialty, is_active, consultation_price FROM professionals WHERE id = $1',
+      [professionalIdNum]
+    )
+    console.log('👨‍⚕️ Todos os profissionais com ID', professionalIdNum, ':', allProfessionalsResult.rows)
+    
+    // Depois, verificar com filtro de is_active
     const professionalResult = await pool.query(
       'SELECT id, consultation_price FROM professionals WHERE id = $1 AND is_active = true',
       [professionalIdNum]
     )
 
-    console.log('👨‍⚕️ Resultado da busca do profissional:', professionalResult.rows)
+    console.log('👨‍⚕️ Profissionais ativos com ID', professionalIdNum, ':', professionalResult.rows)
 
     if (professionalResult.rows.length === 0) {
       console.log('❌ Profissional não encontrado ou inativo')
