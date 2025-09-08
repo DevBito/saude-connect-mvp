@@ -1,9 +1,11 @@
 const errorHandler = (err, req, res, next) => {
+  console.error('🚨 ERROR HANDLER - MIDDLEWARE CHAMADO!')
   console.error('🚨 ERROR HANDLER - Erro capturado:', err)
   console.error('🚨 ERROR HANDLER - URL:', req.url)
   console.error('🚨 ERROR HANDLER - Method:', req.method)
   console.error('🚨 ERROR HANDLER - Headers:', req.headers)
   console.error('🚨 ERROR HANDLER - Body:', req.body)
+  console.error('🚨 ERROR HANDLER - Stack:', err.stack)
 
   // Erro de validação do Joi
   if (err.isJoi) {
@@ -61,6 +63,10 @@ const errorHandler = (err, req, res, next) => {
   // Erro padrão
   const statusCode = err.statusCode || 500
   const message = err.message || 'Erro interno do servidor'
+
+  console.error('🚨 ERROR HANDLER - Enviando resposta de erro:')
+  console.error('🚨 ERROR HANDLER - Status Code:', statusCode)
+  console.error('🚨 ERROR HANDLER - Message:', message)
 
   res.status(statusCode).json({
     success: false,

@@ -156,8 +156,10 @@ router.get('/:id', authenticateToken, async (req, res, next) => {
 // POST /api/appointments
 router.post('/', authenticateToken, async (req, res, next) => {
   try {
+    console.log('🚀 POST /appointments - ROTA CHAMADA!')
     console.log('📅 POST /appointments - Dados recebidos:', req.body)
     console.log('👤 Usuário autenticado:', req.user)
+    console.log('🔍 Headers recebidos:', req.headers)
     
     // Testar conexão com o banco
     console.log('🔍 Testando conexão com o banco de dados...')

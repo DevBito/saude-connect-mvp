@@ -3,6 +3,10 @@ const pool = require('../config/database.js')
 
 const authenticateToken = async (req, res, next) => {
   try {
+    console.log('🔑 AUTH MIDDLEWARE - INICIANDO AUTENTICAÇÃO')
+    console.log('🔑 AUTH MIDDLEWARE - URL:', req.url)
+    console.log('🔑 AUTH MIDDLEWARE - Method:', req.method)
+    
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1] // Bearer TOKEN
 
