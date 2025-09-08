@@ -1243,6 +1243,7 @@ app.get('/api/professionals', async (req, res) => {
   try {
     console.log('👨‍⚕️ Buscando profissionais com filtros:', req.query);
     
+    // Query usando apenas campos que existem na estrutura básica do banco
     let query = 'SELECT id, name, specialty, crm, phone, created_at FROM professionals WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -1261,12 +1262,12 @@ app.get('/api/professionals', async (req, res) => {
       params.push(`%${req.query.search}%`);
     }
 
-    // Filtro por localização (se implementado)
-    if (req.query.location) {
-      paramCount++;
-      query += ` AND (city ILIKE $${paramCount} OR state ILIKE $${paramCount})`;
-      params.push(`%${req.query.location}%`);
-    }
+    // Filtro por localização (removido pois city/state podem não existir)
+    // if (req.query.location) {
+    //   paramCount++;
+    //   query += ` AND (city ILIKE $${paramCount} OR state ILIKE $${paramCount})`;
+    //   params.push(`%${req.query.location}%`);
+    // }
 
     query += ' ORDER BY name';
 
@@ -1297,29 +1298,60 @@ app.get('/api/professionals/:id', async (req, res) => {
   try {
     const { id } = req.params;
     console.log('👨‍⚕️ Buscando profissional com ID:', id);
+    console.log('🔍 Tipo do ID:', typeof id);
     
+    // Verificar se o ID é um número válido
+    if (!id || isNaN(parseInt(id))) {
+      console.log('❌ ID inválido:', id);
+      return res.status(400).json({
+        success: false,
+        message: 'ID do profissional inválido'
+      });
+    }
+
+    const professionalId = parseInt(id);
+    console.log('🔢 ID convertido para número:', professionalId);
+
+    // Verificar se o pool está disponível
+    if (!pool) {
+      console.log('❌ Pool de conexão não disponível');
+      return res.status(500).json({
+        success: false,
+        message: 'Erro de conexão com banco de dados'
+      });
+    }
+
+    console.log('🔍 Executando query...');
+    
+    // Query usando SELECT * para ver exatamente quais campos existem
     const result = await pool.query(
-      'SELECT id, name, specialty, crm, phone, consultation_price, city, state, bio, experience_years, accepts_online, accepts_insurance, is_active, is_verified, created_at FROM professionals WHERE id = $1 AND is_active = true',
-      [id]
+      'SELECT * FROM professionals WHERE id = $1',
+      [professionalId]
     );
 
+    console.log('📊 Resultado da query:', result.rows.length, 'linhas encontradas');
+
     if (result.rows.length === 0) {
-      console.log('❌ Profissional não encontrado com ID:', id);
+      console.log('❌ Profissional não encontrado com ID:', professionalId);
       return res.status(404).json({
         success: false,
         message: 'Profissional não encontrado'
       });
     }
 
-    console.log('✅ Profissional encontrado:', result.rows[0].name);
+    const professional = result.rows[0];
+    console.log('✅ Profissional encontrado:', professional.name);
+    console.log('📋 Dados do profissional:', JSON.stringify(professional, null, 2));
 
     res.json({
       success: true,
-      professional: result.rows[0]
+      professional: professional
     });
 
   } catch (error) {
     console.error('❌ Erro ao buscar profissional:', error);
+    console.error('❌ Mensagem do erro:', error.message);
+    console.error('❌ Stack trace:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
