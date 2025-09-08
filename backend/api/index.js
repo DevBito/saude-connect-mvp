@@ -126,10 +126,9 @@ const professionalSchema = Joi.object({
 });
 
 const appointmentSchema = Joi.object({
-  patient_id: Joi.number().integer().required(),
   professional_id: Joi.number().integer().required(),
-  date: Joi.date().required(),
-  time: Joi.string().required(),
+  appointment_date: Joi.date().required(),
+  type: Joi.string().valid('presential', 'online').optional(),
   notes: Joi.string().optional()
 });
 
@@ -1411,8 +1410,8 @@ app.post('/api/appointments', authenticateToken, async (req, res) => {
     }
     console.log('✅ Dados validados:', value);
 
-    const { patient_id, professional_id, date, time, notes } = value;
-    console.log('📊 Dados extraídos:', { patient_id, professional_id, date, time, notes });
+    const { professional_id, appointment_date, type, notes } = value;
+    console.log('📊 Dados extraídos:', { professional_id, appointment_date, type, notes });
 
     // Verificar se o profissional existe
     console.log('🔍 Verificando se profissional existe...');
@@ -1433,8 +1432,8 @@ app.post('/api/appointments', authenticateToken, async (req, res) => {
     // Criar consulta
     console.log('💾 Inserindo appointment no banco...');
     const result = await pool.query(
-      'INSERT INTO appointments (patient_id, professional_id, date, time, notes, status, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *',
-      [patient_id, professional_id, date, time, notes, 'scheduled']
+      'INSERT INTO appointments (user_id, professional_id, appointment_date, type, notes, status, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *',
+      [req.user.userId, professional_id, appointment_date, type || 'presential', notes, 'scheduled']
     );
     console.log('✅ Appointment criado com sucesso:', result.rows[0]);
 
