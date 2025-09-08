@@ -129,7 +129,7 @@ const appointmentSchema = Joi.object({
   professional_id: Joi.number().integer().required(),
   appointment_date: Joi.date().required(),
   type: Joi.string().valid('presential', 'online').optional(),
-  notes: Joi.string().optional()
+  notes: Joi.string().allow('').optional()
 });
 
 // Middleware de autenticação
