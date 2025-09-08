@@ -219,4 +219,4 @@ Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes
 
 ---
 
-**Saúde Connect** - Conectando pessoas a profissionais de saúde qualificados.
+**Saúde Connect** - Conectando pessoas a profissionais de saúde qualificados..

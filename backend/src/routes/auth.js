@@ -25,7 +25,7 @@ const loginSchema = Joi.object({
 
 const changePasswordSchema = Joi.object({
   currentPassword: Joi.string().required(),
-  newPassword: Joi.string().min(6).required()
+  newPassword: Joi.string().min(6).required() 
 })
 
 // Função para gerar token JWT
@@ -33,7 +33,7 @@ const generateToken = (userId) => {
   return jwt.sign(
     { userId },
     process.env.SAUDE_SUPABASE_JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' } 
   )
 }
 
