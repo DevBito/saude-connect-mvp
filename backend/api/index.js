@@ -1292,6 +1292,42 @@ app.get('/api/professionals', async (req, res) => {
   }
 });
 
+// Obter profissional por ID
+app.get('/api/professionals/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('👨‍⚕️ Buscando profissional com ID:', id);
+    
+    const result = await pool.query(
+      'SELECT id, name, specialty, crm, phone, consultation_price, city, state, bio, experience_years, accepts_online, accepts_insurance, is_active, is_verified, created_at FROM professionals WHERE id = $1 AND is_active = true',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      console.log('❌ Profissional não encontrado com ID:', id);
+      return res.status(404).json({
+        success: false,
+        message: 'Profissional não encontrado'
+      });
+    }
+
+    console.log('✅ Profissional encontrado:', result.rows[0].name);
+
+    res.json({
+      success: true,
+      professional: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('❌ Erro ao buscar profissional:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro interno do servidor',
+      error: error.message
+    });
+  }
+});
+
 // ===== APPOINTMENT ROUTES =====
 
 // Criar consulta
