@@ -52,10 +52,9 @@ export default function Scheduling() {
       setError('')
 
       const appointmentData = {
-        patient_id: parseInt(user.data.id),
         professional_id: parseInt(professional.id),
-        date: selectedDate,
-        time: selectedTime,
+        appointment_date: `${selectedDate}T${selectedTime}:00.000Z`,
+        type: 'presential',
         notes: ''
       }
 
