@@ -1431,6 +1431,7 @@ app.post('/api/appointments', authenticateToken, async (req, res) => {
 
     // Criar consulta
     console.log('💾 Inserindo appointment no banco...');
+    console.log('🔧 VERSÃO CORRIGIDA - Usando patient_id em vez de user_id');
     
     // Converter appointment_date para date e time separados
     const appointmentDate = new Date(appointment_date);
@@ -1469,9 +1470,14 @@ app.post('/api/appointments', authenticateToken, async (req, res) => {
 app.get('/api/appointments', authenticateToken, async (req, res) => {
   try {
     console.log('📅 Buscando appointments para userId:', req.user.userId);
+    console.log('📅 req.user completo:', req.user);
     
     const result = await pool.query(
-      `SELECT a.*, p.name as professional_name, p.specialty 
+      `SELECT a.id, a.patient_id, a.professional_id, a.date, a.time, a.notes, a.status, a.created_at,
+              p.name as professional_name, p.specialty, p.phone as professional_phone,
+              p.address as professional_address, p.city, p.state,
+              -- Criar appointment_date combinando date e time com timezone
+              (a.date || ' ' || a.time)::timestamp with time zone as appointment_date
        FROM appointments a 
        LEFT JOIN professionals p ON a.professional_id = p.id 
        WHERE a.patient_id = $1 
@@ -1480,6 +1486,7 @@ app.get('/api/appointments', authenticateToken, async (req, res) => {
     );
 
     console.log('📅 Appointments encontrados:', result.rows.length);
+    console.log('📅 Primeiro appointment:', result.rows[0]);
 
     res.json({
       success: true,

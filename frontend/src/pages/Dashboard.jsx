@@ -31,10 +31,21 @@ export default function Dashboard() {
       onSuccess: (data) => {
         // Verificar se data é um array válido
         const appointmentsArray = Array.isArray(data) ? data : (data?.data || [])
+        console.log('📅 Dashboard - Appointments recebidos:', appointmentsArray)
+        console.log('📅 Dashboard - Data atual:', new Date())
+        
         const upcoming = appointmentsArray
-          .filter(apt => new Date(apt.appointment_date) > new Date())
+          .filter(apt => {
+            const aptDate = new Date(apt.appointment_date)
+            const now = new Date()
+            const isFuture = aptDate > now
+            console.log(`📅 Dashboard - ${apt.id}: ${apt.appointment_date} (${aptDate}) > ${now} = ${isFuture}`)
+            return isFuture
+          })
           .sort((a, b) => new Date(a.appointment_date) - new Date(b.appointment_date))
           .slice(0, 3)
+        
+        console.log('📅 Dashboard - Próximas consultas:', upcoming)
         setUpcomingAppointments(upcoming)
       }
     }
