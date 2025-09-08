@@ -1,20 +1,84 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { professionalService } from '../services/professionalService'
+import { appointmentService } from '../services/appointmentService'
 import { Calendar, Clock, MapPin, User, LogOut, ArrowLeft } from 'lucide-react'
 
 export default function Scheduling() {
   const { user, logout } = useAuth()
   const { professionalId } = useParams()
+  const navigate = useNavigate()
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
+  const [professional, setProfessional] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const timeSlots = [
     '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
     '11:00', '11:30', '14:00', '14:30', '15:00', '15:30',
     '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'
   ]
+
+  // Carregar dados do profissional
+  useEffect(() => {
+    const loadProfessional = async () => {
+      try {
+        setIsLoading(true)
+        const response = await professionalService.getProfessionalById(professionalId)
+        setProfessional(response.professional)
+      } catch (error) {
+        console.error('Erro ao carregar profissional:', error)
+        setError('Erro ao carregar dados do profissional')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    if (professionalId) {
+      loadProfessional()
+    }
+  }, [professionalId])
+
+  // Função para confirmar agendamento
+  const handleConfirmAppointment = async () => {
+    if (!selectedDate || !selectedTime || !professional) return
+
+    try {
+      setIsSubmitting(true)
+      setError('')
+
+      // Combinar data e hora
+      const appointmentDateTime = new Date(`${selectedDate}T${selectedTime}:00`)
+      
+      const appointmentData = {
+        professional_id: professional.id,
+        appointment_date: appointmentDateTime.toISOString(),
+        type: 'presential',
+        notes: ''
+      }
+
+      const response = await appointmentService.createAppointment(appointmentData)
+      
+      if (response.success) {
+        // Redirecionar para dashboard com mensagem de sucesso
+        navigate('/dashboard', { 
+          state: { 
+            message: 'Consulta agendada com sucesso!',
+            type: 'success'
+          }
+        })
+      }
+    } catch (error) {
+      console.error('Erro ao agendar consulta:', error)
+      setError(error.response?.data?.message || 'Erro ao agendar consulta')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <div style={{
@@ -178,41 +242,83 @@ export default function Scheduling() {
               }}>
                 Profissional
               </h2>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{
-                  width: '64px',
-                  height: '64px',
-                  background: 'var(--primary-100)',
-                  borderRadius: '50%',
-                  display: 'grid',
-                  placeItems: 'center'
-                }}>
-                  <User size={32} style={{ color: 'var(--primary-600)' }} />
+              
+              {isLoading ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{
+                    width: '64px',
+                    height: '64px',
+                    background: 'var(--surface-2)',
+                    borderRadius: '50%',
+                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                  }}></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      height: '20px',
+                      background: 'var(--surface-2)',
+                      borderRadius: '8px',
+                      width: '60%',
+                      marginBottom: '8px',
+                      animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    }}></div>
+                    <div style={{
+                      height: '16px',
+                      background: 'var(--surface-2)',
+                      borderRadius: '6px',
+                      width: '40%',
+                      marginBottom: '8px',
+                      animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    }}></div>
+                    <div style={{
+                      height: '14px',
+                      background: 'var(--surface-2)',
+                      borderRadius: '6px',
+                      width: '30%',
+                      animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    }}></div>
+                  </div>
                 </div>
-                <div>
-                  <h3 style={{
-                    margin: '0 0 4px',
-                    fontWeight: '700',
-                    color: 'var(--text)'
+              ) : professional ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{
+                    width: '64px',
+                    height: '64px',
+                    background: 'var(--primary-100)',
+                    borderRadius: '50%',
+                    display: 'grid',
+                    placeItems: 'center'
                   }}>
-                    Dr. João Silva
-                  </h3>
-                  <p style={{
-                    margin: '0 0 4px',
-                    color: 'var(--primary-600)',
-                    fontWeight: '600'
-                  }}>
-                    Cardiologia
-                  </p>
-                  <p style={{
-                    margin: '0',
-                    fontSize: '.9rem',
-                    color: 'var(--muted)'
-                  }}>
-                    R$ 150,00 por consulta
-                  </p>
+                    <User size={32} style={{ color: 'var(--primary-600)' }} />
+                  </div>
+                  <div>
+                    <h3 style={{
+                      margin: '0 0 4px',
+                      fontWeight: '700',
+                      color: 'var(--text)'
+                    }}>
+                      {professional.name}
+                    </h3>
+                    <p style={{
+                      margin: '0 0 4px',
+                      color: 'var(--primary-600)',
+                      fontWeight: '600'
+                    }}>
+                      {professional.specialty}
+                    </p>
+                    <p style={{
+                      margin: '0',
+                      fontSize: '.9rem',
+                      color: 'var(--muted)'
+                    }}>
+                      {professional.consultation_price ? `R$ ${professional.consultation_price} por consulta` : 'Preço sob consulta'}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                  <p style={{ color: 'var(--muted)' }}>Profissional não encontrado</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -354,31 +460,53 @@ export default function Scheduling() {
                     </div>
                   </div>
                   
-                  <button style={{
-                    width: '100%',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    padding: '14px 20px',
-                    borderRadius: '12px',
-                    fontWeight: '600',
-                    fontSize: '1rem',
-                    border: '1px solid transparent',
-                    cursor: 'pointer',
-                    transition: '.2s transform ease, .25s box-shadow ease, .2s filter ease',
-                    background: 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
-                    color: '#fff',
-                    boxShadow: 'var(--shadow-2)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.filter = 'brightness(1.05)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.filter = 'none';
-                  }}
+                  {error && (
+                    <div style={{
+                      padding: '12px 16px',
+                      background: 'var(--error-50)',
+                      border: '1px solid var(--error-200)',
+                      borderRadius: '8px',
+                      color: 'var(--error-600)',
+                      fontSize: '.9rem',
+                      marginBottom: '16px'
+                    }}>
+                      {error}
+                    </div>
+                  )}
+                  
+                  <button 
+                    onClick={handleConfirmAppointment}
+                    disabled={isSubmitting || !professional}
+                    style={{
+                      width: '100%',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '14px 20px',
+                      borderRadius: '12px',
+                      fontWeight: '600',
+                      fontSize: '1rem',
+                      border: '1px solid transparent',
+                      cursor: isSubmitting || !professional ? 'not-allowed' : 'pointer',
+                      transition: '.2s transform ease, .25s box-shadow ease, .2s filter ease',
+                      background: isSubmitting || !professional ? 'var(--muted)' : 'linear-gradient(135deg, var(--primary-600), var(--secondary-600))',
+                      color: '#fff',
+                      boxShadow: isSubmitting || !professional ? 'none' : 'var(--shadow-2)',
+                      opacity: isSubmitting || !professional ? 0.6 : 1
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSubmitting && professional) {
+                        e.target.style.filter = 'brightness(1.05)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSubmitting && professional) {
+                        e.target.style.filter = 'none';
+                      }
+                    }}
                   >
-                    Confirmar Agendamento
+                    {isSubmitting ? 'Agendando...' : 'Confirmar Agendamento'}
                   </button>
                 </div>
               )}
