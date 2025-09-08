@@ -29,7 +29,9 @@ export default function Dashboard() {
     appointmentService.getUserAppointments,
     {
       onSuccess: (data) => {
-        const upcoming = data
+        // Verificar se data é um array válido
+        const appointmentsArray = Array.isArray(data) ? data : (data?.data || [])
+        const upcoming = appointmentsArray
           .filter(apt => new Date(apt.appointment_date) > new Date())
           .sort((a, b) => new Date(a.appointment_date) - new Date(b.appointment_date))
           .slice(0, 3)
@@ -75,17 +77,20 @@ export default function Dashboard() {
     }
   }
 
+  // Garantir que appointments seja um array válido
+  const appointmentsArray = Array.isArray(appointments) ? appointments : (appointments?.data || [])
+
   const stats = [
     {
       title: 'Consultas Agendadas',
-      value: appointments?.filter(apt => apt.status === 'scheduled').length || 0,
+      value: appointmentsArray.filter(apt => apt.status === 'scheduled').length || 0,
       icon: Calendar,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100'
     },
     {
       title: 'Consultas Realizadas',
-      value: appointments?.filter(apt => apt.status === 'completed').length || 0,
+      value: appointmentsArray.filter(apt => apt.status === 'completed').length || 0,
       icon: TrendingUp,
       color: 'text-green-600',
       bgColor: 'bg-green-100'
