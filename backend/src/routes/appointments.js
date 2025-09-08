@@ -156,22 +156,56 @@ router.get('/:id', authenticateToken, async (req, res, next) => {
 // POST /api/appointments
 router.post('/', authenticateToken, async (req, res, next) => {
   try {
+    console.log('📅 POST /appointments - Dados recebidos:', req.body)
+    console.log('👤 Usuário autenticado:', req.user)
+    
     const { professional_id, appointment_date, type = 'presential', notes } = req.body
 
+    console.log('🔍 Validação dos campos:')
+    console.log('  - professional_id:', professional_id, typeof professional_id)
+    console.log('  - appointment_date:', appointment_date, typeof appointment_date)
+    console.log('  - type:', type, typeof type)
+    console.log('  - notes:', notes, typeof notes)
+
     if (!professional_id || !appointment_date) {
+      console.log('❌ Validação falhou: campos obrigatórios ausentes')
       return res.status(400).json({
         success: false,
         message: 'Profissional e data são obrigatórios'
       })
     }
 
+    // Validar se professional_id é um número válido
+    const professionalIdNum = parseInt(professional_id)
+    if (isNaN(professionalIdNum) || professionalIdNum <= 0) {
+      console.log('❌ Validação falhou: professional_id inválido')
+      return res.status(400).json({
+        success: false,
+        message: 'ID do profissional inválido'
+      })
+    }
+
+    // Validar se appointment_date é uma data válida
+    const appointmentDate = new Date(appointment_date)
+    if (isNaN(appointmentDate.getTime())) {
+      console.log('❌ Validação falhou: appointment_date inválido')
+      return res.status(400).json({
+        success: false,
+        message: 'Data do agendamento inválida'
+      })
+    }
+
     // Verify professional exists and is active
+    console.log('🔍 Verificando profissional com ID:', professionalIdNum)
     const professionalResult = await pool.query(
       'SELECT id, consultation_price FROM professionals WHERE id = $1 AND is_active = true',
-      [professional_id]
+      [professionalIdNum]
     )
 
+    console.log('👨‍⚕️ Resultado da busca do profissional:', professionalResult.rows)
+
     if (professionalResult.rows.length === 0) {
+      console.log('❌ Profissional não encontrado ou inativo')
       return res.status(404).json({
         success: false,
         message: 'Profissional não encontrado'
@@ -181,15 +215,22 @@ router.post('/', authenticateToken, async (req, res, next) => {
     const professional = professionalResult.rows[0]
 
     // Check if appointment time is available
+    console.log('🔍 Verificando disponibilidade do horário:')
+    console.log('  - professional_id:', professionalIdNum)
+    console.log('  - appointment_date:', appointment_date)
+    
     const existingAppointment = await pool.query(
       `SELECT id FROM appointments 
        WHERE professional_id = $1 
        AND appointment_date = $2 
        AND status NOT IN ('cancelled', 'no_show')`,
-      [professional_id, appointment_date]
+      [professionalIdNum, appointment_date]
     )
 
+    console.log('📅 Agendamentos existentes no horário:', existingAppointment.rows)
+
     if (existingAppointment.rows.length > 0) {
+      console.log('❌ Horário não disponível')
       return res.status(409).json({
         success: false,
         message: 'Horário não disponível'
@@ -197,13 +238,21 @@ router.post('/', authenticateToken, async (req, res, next) => {
     }
 
     // Create appointment
+    console.log('📝 Criando agendamento com os seguintes dados:')
+    console.log('  - user_id:', req.user.id)
+    console.log('  - professional_id:', professionalIdNum)
+    console.log('  - appointment_date:', appointment_date)
+    console.log('  - type:', type)
+    console.log('  - notes:', notes)
+    console.log('  - price:', professional.consultation_price)
+    
     const result = await pool.query(
       `INSERT INTO appointments (user_id, professional_id, appointment_date, type, notes, price)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, uuid, appointment_date, status, type, price, created_at`,
       [
         req.user.id,
-        professional_id,
+        professionalIdNum,
         appointment_date,
         type,
         notes,
@@ -211,12 +260,16 @@ router.post('/', authenticateToken, async (req, res, next) => {
       ]
     )
 
+    console.log('✅ Agendamento criado com sucesso:', result.rows[0])
+
     res.status(201).json({
       success: true,
       message: 'Consulta agendada com sucesso',
       appointment: result.rows[0]
     })
   } catch (error) {
+    console.error('❌ Erro ao criar agendamento:', error)
+    console.error('❌ Stack trace:', error.stack)
     next(error)
   }
 })

@@ -51,9 +51,14 @@ export default function Scheduling() {
       setIsSubmitting(true)
       setError('')
 
+      // Criar data no formato correto para o backend
+      const appointmentDateTime = new Date(`${selectedDate}T${selectedTime}:00`)
+      console.log('🔍 Data criada:', appointmentDateTime)
+      console.log('🔍 Data ISO:', appointmentDateTime.toISOString())
+      
       const appointmentData = {
         professional_id: parseInt(professional.id),
-        appointment_date: `${selectedDate}T${selectedTime}:00.000Z`,
+        appointment_date: appointmentDateTime.toISOString(),
         type: 'presential',
         notes: ''
       }
@@ -61,6 +66,9 @@ export default function Scheduling() {
       console.log('📅 Dados do agendamento:', appointmentData)
       console.log('👤 Usuário:', user)
       console.log('👨‍⚕️ Profissional:', professional)
+      console.log('🔍 professional.id:', professional.id, typeof professional.id)
+      console.log('🔍 professional_id convertido:', parseInt(professional.id), typeof parseInt(professional.id))
+      console.log('🔍 appointment_date:', appointmentData.appointment_date)
       console.log('🔑 Token no localStorage:', localStorage.getItem('token'))
 
       const response = await appointmentService.createAppointment(appointmentData)
