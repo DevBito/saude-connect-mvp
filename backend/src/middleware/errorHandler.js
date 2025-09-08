@@ -1,5 +1,9 @@
 const errorHandler = (err, req, res, next) => {
-  console.error('Erro capturado:', err)
+  console.error('🚨 ERROR HANDLER - Erro capturado:', err)
+  console.error('🚨 ERROR HANDLER - URL:', req.url)
+  console.error('🚨 ERROR HANDLER - Method:', req.method)
+  console.error('🚨 ERROR HANDLER - Headers:', req.headers)
+  console.error('🚨 ERROR HANDLER - Body:', req.body)
 
   // Erro de validação do Joi
   if (err.isJoi) {

@@ -2,10 +2,10 @@
   "name": "saude-connect-mvp",
   "version": "1.0.0",
   "description": "Saúde Connect MVP - Sistema de agendamento médico",
-  "main": "api/backend.js",
+  "main": "api/index.js",
   "scripts": {
     "build": "echo 'Build completed'",
-    "start": "node api/backend.js"
+    "start": "node api/index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
