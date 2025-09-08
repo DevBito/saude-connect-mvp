@@ -24,13 +24,16 @@ export default function Professionals() {
     availability: ''
   })
 
-  const { data: professionals, isLoading } = useQuery(
+  const { data: professionalsResponse, isLoading } = useQuery(
     ['professionals', filters],
     () => professionalService.getProfessionals(filters),
     {
       keepPreviousData: true
     }
   )
+
+  // Extrair o array de profissionais da resposta da API
+  const professionals = professionalsResponse?.data || []
 
   const specialties = [
     'Clínica Geral',
