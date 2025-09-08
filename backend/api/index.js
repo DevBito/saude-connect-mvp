@@ -1431,9 +1431,17 @@ app.post('/api/appointments', authenticateToken, async (req, res) => {
 
     // Criar consulta
     console.log('💾 Inserindo appointment no banco...');
+    
+    // Converter appointment_date para date e time separados
+    const appointmentDate = new Date(appointment_date);
+    const date = appointmentDate.toISOString().split('T')[0]; // YYYY-MM-DD
+    const time = appointmentDate.toTimeString().split(' ')[0]; // HH:MM:SS
+    
+    console.log('📅 Data convertida:', { date, time });
+    
     const result = await pool.query(
-      'INSERT INTO appointments (user_id, professional_id, appointment_date, type, notes, status, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *',
-      [req.user.userId, professional_id, appointment_date, type || 'presential', notes, 'scheduled']
+      'INSERT INTO appointments (patient_id, professional_id, date, time, notes, status, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *',
+      [req.user.userId, professional_id, date, time, notes, 'scheduled']
     );
     console.log('✅ Appointment criado com sucesso:', result.rows[0]);
 
