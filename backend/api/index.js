@@ -1394,25 +1394,36 @@ app.get('/api/debug/professionals-structure', async (req, res) => {
 // Criar consulta
 app.post('/api/appointments', authenticateToken, async (req, res) => {
   try {
+    console.log('📅 === INÍCIO DA CRIAÇÃO DE APPOINTMENT ===');
+    console.log('👤 Usuário autenticado:', req.user);
+    console.log('📋 Body recebido:', req.body);
+    
     // Validação com Joi
+    console.log('🔍 Validando dados com Joi...');
     const { error, value } = appointmentSchema.validate(req.body);
     if (error) {
+      console.log('❌ Erro de validação:', error.details);
       return res.status(400).json({
         success: false,
         message: 'Dados inválidos',
         errors: error.details.map(detail => detail.message)
       });
     }
+    console.log('✅ Dados validados:', value);
 
     const { patient_id, professional_id, date, time, notes } = value;
+    console.log('📊 Dados extraídos:', { patient_id, professional_id, date, time, notes });
 
     // Verificar se o profissional existe
+    console.log('🔍 Verificando se profissional existe...');
     const professional = await pool.query(
       'SELECT id FROM professionals WHERE id = $1',
       [professional_id]
     );
+    console.log('👨‍⚕️ Profissional encontrado:', professional.rows.length > 0);
 
     if (professional.rows.length === 0) {
+      console.log('❌ Profissional não encontrado');
       return res.status(404).json({
         success: false,
         message: 'Profissional não encontrado'
@@ -1420,11 +1431,14 @@ app.post('/api/appointments', authenticateToken, async (req, res) => {
     }
 
     // Criar consulta
+    console.log('💾 Inserindo appointment no banco...');
     const result = await pool.query(
       'INSERT INTO appointments (patient_id, professional_id, date, time, notes, status, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *',
       [patient_id, professional_id, date, time, notes, 'scheduled']
     );
+    console.log('✅ Appointment criado com sucesso:', result.rows[0]);
 
+    console.log('📅 === APPOINTMENT CRIADO COM SUCESSO ===');
     res.status(201).json({
       success: true,
       message: 'Consulta agendada com sucesso!',
@@ -1432,10 +1446,14 @@ app.post('/api/appointments', authenticateToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Erro ao criar consulta:', error);
+    console.error('❌ === ERRO AO CRIAR APPOINTMENT ===');
+    console.error('❌ Erro completo:', error);
+    console.error('❌ Mensagem:', error.message);
+    console.error('❌ Stack trace:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Erro interno do servidor'
+      message: 'Erro interno do servidor',
+      error: error.message
     });
   }
 });

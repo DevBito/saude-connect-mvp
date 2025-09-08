@@ -51,13 +51,11 @@ export default function Scheduling() {
       setIsSubmitting(true)
       setError('')
 
-      // Combinar data e hora
-      const appointmentDateTime = new Date(`${selectedDate}T${selectedTime}:00`)
-      
       const appointmentData = {
+        patient_id: user.id,
         professional_id: professional.id,
-        appointment_date: appointmentDateTime.toISOString(),
-        type: 'presential',
+        date: selectedDate,
+        time: selectedTime,
         notes: ''
       }
 
